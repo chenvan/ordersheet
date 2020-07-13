@@ -69,8 +69,12 @@ End Sub
 
 Sub speakLater(ByVal laterTime As Variant, ByVal content As String)
     '如果安排的时间已经过了,应该立即进行语音提醒
-    
-    Application.OnTime laterTime, "'speakAsync """ & content & "'"
+    If Now() >= laterTime Then
+        content = "已超时," & content
+        Application.OnTime Now(), "'speakAsync """ & content & "'"
+    Else
+        Application.OnTime laterTime, "'speakAsync """ & content & "'"
+    End If
 End Sub
 
 Sub speakAsync(ByVal content As String)
@@ -78,20 +82,25 @@ Sub speakAsync(ByVal content As String)
 End Sub
 
 Sub showMsgLater(ByVal laterTime As Variant, ByVal content As String)
-     Application.OnTime laterTime, "'showMsg """ & content & "'"
+    If Now() >= laterTime Then
+        content = "已超时," & content
+        Application.OnTime Now(), "'showMsg """ & content & "'"
+    Else
+        Application.OnTime laterTime, "'showMsg """ & content & "'"
+    End If
 End Sub
 
 Sub showMsg(ByVal content As String)
-    Application.StatusBar = "***" & content & "***"
+    Application.StatusBar = "##" & content & "   " & Left(Application.StatusBar, 80)
 End Sub
 
 
-Sub shedule(ByVal target As String, ByVal tAnchor As Variant, ByVal cOffset As Integer, ByVal isSweep As Boolean)
+Sub shedule(ByVal target As String, ByVal tAnchor As Variant, ByVal cOffset As Integer, ByVal delay As Integer)
     '语音提示安排函数
     '@taget: 烟牌号
     '@tAnchor: 时间锚点
     '@cOffset: 所属生产段与A列的列间隔
-    '@isSweep: 是否清扫
+    '@delay: 推迟时间
     
     Dim found As Range
     Dim col, content As String
@@ -100,12 +109,6 @@ Sub shedule(ByVal target As String, ByVal tAnchor As Variant, ByVal cOffset As I
     
     Set found = Sheets("语音提示").Range("A:A").Find(target, , , xlWhole)
     col = found.Offset(0, cOffset).value
-    
-    If isSweep Then
-        '最多只能加到z
-        col = Chr(Asc(col) + 2)
-        'Debug.Print "列: " & col
-    End If
     
     With Sheets("语音提示")
         '找到语音提醒的最后一行
@@ -118,7 +121,7 @@ Sub shedule(ByVal target As String, ByVal tAnchor As Variant, ByVal cOffset As I
             'Debug.Print col & ": " & .Range(col & index).value
             
             '语音提醒时间与锚点的时间间隔
-            tsOffset = .Range(col & index).value
+            tsOffset = .Range(col & index).value + delay
             content = .Range(col & index).Offset(0, 1).value
             speakLater tAnchor + TimeSerial(0, tsOffset, 0), content
             showMsgLater tAnchor + TimeSerial(0, tsOffset, 0), content
