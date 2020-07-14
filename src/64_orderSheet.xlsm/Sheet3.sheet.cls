@@ -28,33 +28,39 @@ Private Sub Worksheet_Change(ByVal target As Range)
             
             'Debug.Print (currentTobacco)
             
-            Util.shedule currentTobacco, target.value, 3, 0
+            Util.shedule currentTobacco, target.value, 5, 0
         
         End If
         
         If target.Column = endTimeColumn And Util.IsNum(target.value) Then
-            '结束时间列触发批结束语音提醒
+            '结束时间列触发批结束语音提醒, 下一批开始前提醒语音
             
-            '通过对比下一批次与现批次的牌号判断加料是否需要清扫, 再选择哪个(指针)列
+            '通过对比下一批次与现批次的牌号判断加料是否需要延时
             '注意下一批次是空白的情况
             
-            Dim colOffset As Integer
-            colOffset = 4
+            Dim feedLiquidSweepDelay As Integer
+            feedLiquidSweepDelay = 0
             
             currentTobacco = target.Offset(0, 3 - target.Column).value
             nextTobacco = target.Offset(1, 3 - target.Column).value
             
-            If currentTobacco <> nextTobacco And nextTobacco <> "" Then
-                colOffset = 5
-            ElseIf nextTobacco = "" Then
+            If nextTobacco = "" Then
                 '提醒写下一批次的烟牌,并重新填写这一批次的结束时间
                 'Debug.Print "空白牌号"
                 Util.speakAsync "请填下一批的牌号, 并重新填写这批加料结束时间"
                 Exit Sub
             End If
             
-            '批结束的提醒是通用的提醒, 烟牌号用现在的和下一批的没有区别
-            Util.shedule nextTobacco, target.value, colOffset, 0
+            If currentTobacco <> nextTobacco Then
+                '下一批次为不同牌号需要洗加料管, 延时10分钟
+                feedLiquidSweepDelay = 10
+            End If
+            
+            '批结束提醒
+            Util.shedule currentTobacco, target.value, 6, 0
+            
+            '下一批开始前提醒
+            Util.shedule nextTobacco, target.value, 4, feedLiquidSweepDelay
         End If
     End If
 End Sub

@@ -69,9 +69,12 @@ End Sub
 
 Sub speakLater(ByVal laterTime As Variant, ByVal content As String)
     '如果安排的时间已经过了,应该立即进行语音提醒
-    If Now() >= laterTime Then
+    'Debug.Print Time
+    'Debug.Print laterTime
+    If Time >= laterTime Then
+        'Debug.Print "超时"
         content = "已超时," & content
-        Application.OnTime Now(), "'speakAsync """ & content & "'"
+        Application.OnTime Now, "'speakAsync """ & content & "'"
     Else
         Application.OnTime laterTime, "'speakAsync """ & content & "'"
     End If
@@ -82,9 +85,9 @@ Sub speakAsync(ByVal content As String)
 End Sub
 
 Sub showMsgLater(ByVal laterTime As Variant, ByVal content As String)
-    If Now() >= laterTime Then
+    If Time >= laterTime Then
         content = "已超时," & content
-        Application.OnTime Now(), "'showMsg """ & content & "'"
+        Application.OnTime Now, "'showMsg """ & content & "'"
     Else
         Application.OnTime laterTime, "'showMsg """ & content & "'"
     End If
