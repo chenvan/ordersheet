@@ -115,13 +115,16 @@ Sub shedule(ByVal target As String, ByVal tAnchor As Variant, ByVal cOffset As I
     
     With Sheets("语音提示")
         '找到语音提醒的最后一行
-        lastRow = .Range(col & "1", .Range(col & "1").End(xlDown)).Rows.Count
+        'use .End(xlDown).End(xlDown).End(xlUp) instead of only use .End(xlDown)
+        'it can aviod return too many rowscount if the tips is empty
+        lastRow = .Range(col & "1", .Range(col & "1").End(xlDown).End(xlDown).End(xlUp)).Rows.Count
         'Debug.Print lastRow
         'Debug.Print tAnchor
         
         '语音提醒是从第二行开始
+        Debug.Print "last row: " & lastRow
+        
         For index = 2 To lastRow
-            'Debug.Print col & ": " & .Range(col & index).value
             
             '语音提醒时间与锚点的时间间隔
             tsOffset = .Range(col & index).value + delay
