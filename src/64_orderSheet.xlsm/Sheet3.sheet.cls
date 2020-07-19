@@ -5,6 +5,7 @@ Private Sub Worksheet_Change(ByVal target As Range)
     If Not IsArray(target.value) Then
         Dim beginTimeColumn, endTimeColumn As Integer
         Dim currentTobacco, nextTobacco As String
+        Dim dateOfSelectedRow As Variant
         
         beginTimeColumn = 8
         endTimeColumn = 9
@@ -25,11 +26,18 @@ Private Sub Worksheet_Change(ByVal target As Range)
             '开始时间列触发批开始语音提醒
             
             currentTobacco = target.Offset(0, 3 - target.Column).value
+            dateOfSelectedRow = target.Offset(0, 1 - target.Column).value
             
             'Debug.Print (currentTobacco)
+            'Debug.Print dateOfSelectedRow
             
-            Util.shedule currentTobacco, target.value, 5, 0
-        
+            '行的日期为今天或者是空内容时才进行提醒
+            If dateOfSelectedRow = Date Or IsEmpty(dateOfSelectedRow) Then
+                Util.shedule currentTobacco, target.value, 5, 0
+            Else
+                Util.showMsg "日期并非今天, 加料开始时间不会触发语音提醒"
+            End If
+            
         End If
         
         If target.Column = endTimeColumn And Util.IsNum(target.value) Then
@@ -51,16 +59,23 @@ Private Sub Worksheet_Change(ByVal target As Range)
                 Exit Sub
             End If
             
-            If currentTobacco <> nextTobacco Then
-                '下一批次为不同牌号需要洗加料管, 延时10分钟
-                feedLiquidSweepDelay = 10
+            dateOfSelectedRow = target.Offset(0, 1 - target.Column).value
+            
+            '行的日期为今天或者是空内容时才进行提醒
+            If dateOfSelectedRow = Date Or IsEmpty(dateOfSelectedRow) Then
+                If currentTobacco <> nextTobacco Then
+                    '下一批次为不同牌号需要洗加料管, 延时10分钟
+                    feedLiquidSweepDelay = 10
+                End If
+                
+                '批结束提醒
+                Util.shedule currentTobacco, target.value, 6, 0
+                '下一批开始前提醒
+                Util.shedule nextTobacco, target.value, 4, feedLiquidSweepDelay
+            Else
+                 Util.showMsg "日期并非今天, 加料结束时间不会触发语音提醒"
             End If
             
-            '批结束提醒
-            Util.shedule currentTobacco, target.value, 6, 0
-            
-            '下一批开始前提醒
-            Util.shedule nextTobacco, target.value, 4, feedLiquidSweepDelay
         End If
     End If
 End Sub

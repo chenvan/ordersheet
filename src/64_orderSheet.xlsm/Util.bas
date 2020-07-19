@@ -73,7 +73,7 @@ Sub speakLater(ByVal laterTime As Variant, ByVal content As String)
     'Debug.Print laterTime
     If Time >= laterTime Then
         'Debug.Print "超时"
-        content = "已超时," & content
+        content = "超时," & content
         Application.OnTime Now, "'speakAsync """ & content & "'"
     Else
         Application.OnTime laterTime, "'speakAsync """ & content & "'"
@@ -86,7 +86,7 @@ End Sub
 
 Sub showMsgLater(ByVal laterTime As Variant, ByVal content As String)
     If Time >= laterTime Then
-        content = "已超时," & content
+        content = "超时," & content
         Application.OnTime Now, "'showMsg """ & content & "'"
     Else
         Application.OnTime laterTime, "'showMsg """ & content & "'"
@@ -108,6 +108,8 @@ Sub shedule(ByVal target As String, ByVal tAnchor As Variant, ByVal cOffset As I
     Dim found As Range
     Dim col, content As String
     Dim index, lastRow, tsOffset As Integer
+    Dim triggerTime As Variant
+    Dim timeDiffInMin As Integer
     
     
     Set found = Sheets("语音提示").Range("A:A").Find(target, , , xlWhole)
@@ -116,26 +118,35 @@ Sub shedule(ByVal target As String, ByVal tAnchor As Variant, ByVal cOffset As I
     With Sheets("语音提示")
         '找到语音提醒的最后一行
         'use .End(xlDown).End(xlDown).End(xlUp) instead of only use .End(xlDown)
-        'it can aviod return too many rowscount if the tips is empty
+        'it can avoid return too many rowscount if the tips is empty
         lastRow = .Range(col & "1", .Range(col & "1").End(xlDown).End(xlDown).End(xlUp)).Rows.Count
         'Debug.Print lastRow
         'Debug.Print tAnchor
         
         '语音提醒是从第二行开始
-        Debug.Print "last row: " & lastRow
+        'Debug.Print "last row: " & lastRow
         
         For index = 2 To lastRow
             
             '语音提醒时间与锚点的时间间隔
             tsOffset = .Range(col & index).value + delay
+            triggerTime = tAnchor + TimeSerial(0, tsOffset, 0)
+            timeDiffInMin = (triggerTime - Time) * 1440
             content = .Range(col & index).Offset(0, 1).value
-            speakLater tAnchor + TimeSerial(0, tsOffset, 0), content
-            showMsgLater tAnchor + TimeSerial(0, tsOffset, 0), content
+            
+            '检查时间, 如果没有超时10分钟, 就进行提醒
+            If timeDiffInMin > -11 Then
+                speakLater triggerTime, content
+                showMsgLater triggerTime, content
+            Else
+                showMsg "超时大于10分钟, 不会进行语音提醒, $" & content
+            End If
         Next index
     
     End With
        
 End Sub
+
 
 
 
