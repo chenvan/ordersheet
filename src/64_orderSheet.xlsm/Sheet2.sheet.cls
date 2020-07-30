@@ -1,4 +1,4 @@
-Private Sub Worksheet_Change(ByVal target As Range)
+Private Sub Worksheet_Change(ByVal target As range)
     Dim timeFormatColumns As Variant
     timeFormatColumns = Array(7, 8)
     
@@ -25,8 +25,8 @@ Private Sub Worksheet_Change(ByVal target As Range)
         If target.Column = beginTimeColumn And Util.IsNum(target.value) Then
             '开始时间列触发批开始语音提醒
             
-            currentTobacco = target.Offset(0, 3 - target.Column).value
-            dateOfSelectedRow = target.Offset(0, 1 - target.Column).value
+            currentTobacco = target.offset(0, 3 - target.Column).value
+            dateOfSelectedRow = target.offset(0, 1 - target.Column).value
    
             '行的日期为今天或者是空内容时才进行提醒
             If dateOfSelectedRow = Date Or IsEmpty(dateOfSelectedRow) Then
@@ -42,8 +42,8 @@ Private Sub Worksheet_Change(ByVal target As Range)
             
             '注意下一批次是空白的情况
             
-            currentTobacco = target.Offset(0, 3 - target.Column).value
-            nextTobacco = target.Offset(1, 3 - target.Column).value
+            currentTobacco = target.offset(0, 3 - target.Column).value
+            nextTobacco = target.offset(1, 3 - target.Column).value
 
             If nextTobacco = "" Then
                 '提醒写下一批次的烟牌,并重新填写这一批次的结束时间
@@ -52,7 +52,7 @@ Private Sub Worksheet_Change(ByVal target As Range)
                 Exit Sub
             End If
             
-            dateOfSelectedRow = target.Offset(0, 1 - target.Column).value
+            dateOfSelectedRow = target.offset(0, 1 - target.Column).value
             
             '行的日期为今天或者是空内容时才进行提醒
             If dateOfSelectedRow = Date Or IsEmpty(dateOfSelectedRow) Then
@@ -60,6 +60,8 @@ Private Sub Worksheet_Change(ByVal target As Range)
                 Util.shedule currentTobacco, target.value, 3, 0
                 '下一批开始前提醒
                 Util.shedule nextTobacco, target.value, 1, 0
+                '下一批次特殊提醒
+                Util.speakPrecaution nextTobacco, target.value, "K", 0
             Else
                  Util.showMsg "日期并非今天, 回潮结束时间不会触发语音提醒"
             End If

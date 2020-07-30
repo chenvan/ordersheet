@@ -3,7 +3,7 @@ Private Sub Workbook_Open()
     Application.OnTime TimeValue("22:10:00"), "AutoBackup.AutoBackup"
 End Sub
 
-Private Sub Workbook_SheetChange(ByVal Sh As Object, ByVal target As Range)
+Private Sub Workbook_SheetChange(ByVal Sh As Object, ByVal target As range)
     Dim sheetNames As Variant
     Dim settingSheetName As String
     
@@ -14,7 +14,7 @@ Private Sub Workbook_SheetChange(ByVal Sh As Object, ByVal target As Range)
         
         If Util.IsInArray(Sh.Name, sheetNames) And target.Column = 4 And Util.IsNum(target.value) Then
             Dim tobaccoCode As String
-            tobaccoCode = Tobacco.GetTobaccoCode(target.Offset(0, -1).value, sheetNameWithCode)
+            tobaccoCode = Tobacco.GetTobaccoCode(target.offset(0, -1).value, sheetNameWithCode)
             
             If tobaccoCode <> "" Then
                 Dim segments() As String
@@ -33,10 +33,16 @@ Private Sub Workbook_SheetChange(ByVal Sh As Object, ByVal target As Range)
 End Sub
 
 
-Private Sub Workbook_SheetSelectionChange(ByVal Sh As Object, ByVal target As Range)
+Private Sub Workbook_SheetSelectionChange(ByVal Sh As Object, ByVal target As range)
     'hightlight selectd cell's row and  column, need to set rule first at home tab
     If Application.CutCopyMode = False Then
         Application.Calculate
     End If
     
+End Sub
+
+Public Sub showHidden()
+    For Each itemName In ActiveWorkbook.Names
+        itemName.Visible = True
+    Next
 End Sub

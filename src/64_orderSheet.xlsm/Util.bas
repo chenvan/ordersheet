@@ -1,4 +1,10 @@
 Attribute VB_Name = "Util"
+Private Type tipInfo
+    tipContent As String
+    tipTriggerTime As Variant
+    tipTimeDiffInMin As Integer
+End Type
+
 Function IsInArray(beFound As Variant, arr As Variant) As Boolean
     Dim i As Integer
     
@@ -15,6 +21,20 @@ Function IsInArray(beFound As Variant, arr As Variant) As Boolean
     
 End Function
 
+Function isInSheetRange(ByVal target As Variant, ByVal shName As String, ByVal rangeName As String) As Boolean
+    Dim resultRng As range
+    
+    With Sheets(shName).range(rangeName)
+        Set resultRng = .Find(What:=target)
+        
+        If resultRng Is Nothing Then
+            isInSheetRange = False
+        Else
+            isInSheetRange = True
+        End If
+        
+    End With
+End Function
 
 Function IsIntType(ByVal value As Variant) As Boolean
     'it seems Int function will translate empty string to 0
@@ -38,26 +58,26 @@ Sub clearContent()
     answer = MsgBox("此操作将会把所有内容清空，是否已经把文件另存", vbYesNoCancel, "警告")
     
     If answer = 6 Then
-        Sheets("回潮段").Range("A3:A1171").ClearContents
-        Sheets("回潮段").Range("C3:K1171").ClearContents
-        Sheets("回潮段").Range("M3:N1171").ClearContents
-        Sheets("回潮段").Range("P3:P1171").ClearContents
+        Sheets("回潮段").range("A3:A1171").ClearContents
+        Sheets("回潮段").range("C3:K1171").ClearContents
+        Sheets("回潮段").range("M3:N1171").ClearContents
+        Sheets("回潮段").range("P3:P1171").ClearContents
         
-        Sheets("加料段").Range("A3:A1321").ClearContents
-        Sheets("加料段").Range("C3:D1321").ClearContents
-        Sheets("加料段").Range("G3:K1321").ClearContents
-        Sheets("加料段").Range("N3:P1321").ClearContents
-        Sheets("加料段").Range("R3:R1321").ClearContents
+        Sheets("加料段").range("A3:A1321").ClearContents
+        Sheets("加料段").range("C3:D1321").ClearContents
+        Sheets("加料段").range("G3:K1321").ClearContents
+        Sheets("加料段").range("N3:P1321").ClearContents
+        Sheets("加料段").range("R3:R1321").ClearContents
         
-        Sheets("切烘加香段").Range("A3:A1251").ClearContents
-        Sheets("切烘加香段").Range("C3:D1251").ClearContents
-        Sheets("切烘加香段").Range("G3:J1251").ClearContents
-        Sheets("切烘加香段").Range("L3:AC1251").ClearContents
-        Sheets("切烘加香段").Range("AE3:AE1251").ClearContents
+        Sheets("切烘加香段").range("A3:A1251").ClearContents
+        Sheets("切烘加香段").range("C3:D1251").ClearContents
+        Sheets("切烘加香段").range("G3:J1251").ClearContents
+        Sheets("切烘加香段").range("L3:AC1251").ClearContents
+        Sheets("切烘加香段").range("AE3:AE1251").ClearContents
         
-        Sheets("HDT段").Range("A3:A152").ClearContents
-        Sheets("HDT段").Range("C3:D152").ClearContents
-        Sheets("HDT段").Range("L3:L152").ClearContents
+        Sheets("HDT段").range("A3:A152").ClearContents
+        Sheets("HDT段").range("C3:D152").ClearContents
+        Sheets("HDT段").range("L3:L152").ClearContents
         
     ElseIf answer = 7 Then
         varResult = Application.GetSaveAsFilename(filefilter:="Marco Enabled Workbook(*.xlsm), *xlsm")
@@ -84,6 +104,7 @@ Sub speakAsync(ByVal content As String)
     Application.Speech.speak content & "。" & content, True
 End Sub
 
+    
 Sub showMsgLater(ByVal laterTime As Variant, ByVal content As String)
     If Time >= laterTime Then
         content = "超时," & content
@@ -105,21 +126,19 @@ Sub shedule(ByVal target As String, ByVal tAnchor As Variant, ByVal cOffset As I
     '@cOffset: 所属生产段与A列的列间隔
     '@delay: 推迟时间
     
-    Dim found As Range
-    Dim col, content As String
-    Dim index, lastRow, tsOffset As Integer
-    Dim triggerTime As Variant
-    Dim timeDiffInMin As Integer
+    Dim found As range
+    Dim col As String
+    Dim index, lastRow As Integer
+    Dim info As tipInfo
     
-    
-    Set found = Sheets("语音提示").Range("A:A").Find(target, , , xlWhole)
-    col = found.Offset(0, cOffset).value
+    Set found = Sheets("语音提示").range("A:A").Find(target, , , xlWhole)
+    col = found.offset(0, cOffset).value
     
     With Sheets("语音提示")
         '找到语音提醒的最后一行
         'use .End(xlDown).End(xlDown).End(xlUp) instead of only use .End(xlDown)
         'it can avoid return too many rowscount if the tips is empty
-        lastRow = .Range(col & "1", .Range(col & "1").End(xlDown).End(xlDown).End(xlUp)).Rows.Count
+        lastRow = .range(col & "1", .range(col & "1").End(xlDown).End(xlDown).End(xlUp)).Rows.Count
         'Debug.Print lastRow
         'Debug.Print tAnchor
         
@@ -127,25 +146,57 @@ Sub shedule(ByVal target As String, ByVal tAnchor As Variant, ByVal cOffset As I
         'Debug.Print "last row: " & lastRow
         
         For index = 2 To lastRow
+
+            info = getTipInfo(col, index, tAnchor, delay)
+            runTipInfo info, -11
             
-            '语音提醒时间与锚点的时间间隔
-            tsOffset = .Range(col & index).value + delay
-            triggerTime = tAnchor + TimeSerial(0, tsOffset, 0)
-            timeDiffInMin = (triggerTime - Time) * 1440
-            content = .Range(col & index).Offset(0, 1).value
-            
-            '检查时间, 如果没有超时10分钟, 就进行提醒
-            If timeDiffInMin > -11 Then
-                speakLater triggerTime, content
-                showMsgLater triggerTime, content
-            Else
-                showMsg "超时大于10分钟, 不会进行语音提醒, $" & content
-            End If
         Next index
     
     End With
        
 End Sub
+
+Sub speakPrecaution(ByVal target As String, ByVal tAnchor As Variant, ByVal colName As String, ByVal delay As Integer)
+    Dim found As range
+    Dim preCautionTip As tipInfo
+    
+    Set found = Sheets("语音提示").range("A:A").Find(target, , , xlWhole)
+    preCautionTip = getTipInfo(colName, found.Row, tAnchor, delay)
+    runTipInfo preCautionTip, -11
+
+End Sub
+
+Private Function getTipInfo(ByVal colName As String, ByVal rowIndex As Integer, ByVal tAnchor As Variant, ByVal delay As Integer) As tipInfo
+    Dim info As tipInfo
+    Dim tsOffset As Integer
+    Dim triggerTime As Variant
+    Dim content As String
+    
+    '语音提醒时间与锚点的时间间隔
+    tsOffset = Sheets("语音提示").range(colName & rowIndex).value + delay
+    content = Sheets("语音提示").range(colName & rowIndex).offset(0, 1).value
+    triggerTime = tAnchor + TimeSerial(0, tsOffset, 0)
+    
+    With info
+        .tipContent = content
+        .tipTriggerTime = triggerTime
+        .tipTimeDiffInMin = (triggerTime - Time) * 1440
+    End With
+    
+    getTipInfo = info
+End Function
+
+Sub runTipInfo(ByRef info As tipInfo, ByVal latestTime As Integer)
+    If info.tipTimeDiffInMin > latestTime Then
+       speakLater info.tipTriggerTime, info.tipContent
+       showMsgLater info.tipTriggerTime, info.tipContent
+    Else
+        showMsg "超时大于" & Abs(latestTime) - 1 & "分钟, 不会进行语音提醒, $" & info.tipContent
+    End If
+End Sub
+
+
+
 
 
 
