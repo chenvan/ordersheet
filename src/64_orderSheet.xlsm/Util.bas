@@ -119,12 +119,13 @@ Sub showMsg(ByVal content As String)
 End Sub
 
 
-Sub shedule(ByVal target As String, ByVal tAnchor As Variant, ByVal cOffset As Integer, ByVal delay As Integer)
+Sub shedule(ByVal target As String, ByVal tAnchor As Variant, ByVal cOffset As Integer, ByVal delay As Integer, Optional ByVal isTriggerNow As Boolean = False)
     '语音提示安排函数
     '@taget: 烟牌号
     '@tAnchor: 时间锚点
     '@cOffset: 所属生产段与A列的列间隔
     '@delay: 推迟时间
+    '@isTriggerNow: 立即提醒
     
     Dim found As range
     Dim col As String
@@ -147,7 +148,7 @@ Sub shedule(ByVal target As String, ByVal tAnchor As Variant, ByVal cOffset As I
         
         For index = 2 To lastRow
 
-            info = getTipInfo(col, index, tAnchor, delay)
+            info = getTipInfo(col, index, tAnchor, delay, isTriggerNow)
             runTipInfo info, -11
             
         Next index
@@ -156,27 +157,34 @@ Sub shedule(ByVal target As String, ByVal tAnchor As Variant, ByVal cOffset As I
        
 End Sub
 
-Sub speakPrecaution(ByVal target As String, ByVal tAnchor As Variant, ByVal colName As String, ByVal delay As Integer)
+Sub speakPrecaution(ByVal target As String, ByVal tAnchor As Variant, ByVal colName As String, ByVal delay As Integer, Optional ByVal isTriggerNow As Boolean = False)
     Dim found As range
     Dim preCautionTip As tipInfo
-    
+
     Set found = Sheets("语音提示").range("A:A").Find(target, , , xlWhole)
-    preCautionTip = getTipInfo(colName, found.Row, tAnchor, delay)
+    preCautionTip = getTipInfo(colName, found.Row, tAnchor, delay, isTriggerNow)
+
     runTipInfo preCautionTip, -11
 
 End Sub
 
-Private Function getTipInfo(ByVal colName As String, ByVal rowIndex As Integer, ByVal tAnchor As Variant, ByVal delay As Integer) As tipInfo
+Private Function getTipInfo(ByVal colName As String, ByVal rowIndex As Integer, ByVal tAnchor As Variant, ByVal delay As Integer, ByVal isTriggerNow As Boolean) As tipInfo
     Dim info As tipInfo
     Dim tsOffset As Integer
     Dim triggerTime As Variant
     Dim content As String
     
     '语音提醒时间与锚点的时间间隔
+
     tsOffset = Sheets("语音提示").range(colName & rowIndex).value + delay
     content = Sheets("语音提示").range(colName & rowIndex).offset(0, 1).value
-    triggerTime = tAnchor + TimeSerial(0, tsOffset, 0)
     
+    If isTriggerNow Then
+        triggerTime = Time + TimeSerial(0, 0, 2)
+    Else
+        triggerTime = tAnchor + TimeSerial(0, tsOffset, 0)
+    End If
+
     With info
         .tipContent = content
         .tipTriggerTime = triggerTime
@@ -192,6 +200,23 @@ Sub runTipInfo(ByRef info As tipInfo, ByVal latestTime As Integer)
        showMsgLater info.tipTriggerTime, info.tipContent
     Else
         showMsg "超时大于" & Abs(latestTime) - 1 & "分钟, 不会进行语音提醒, $" & info.tipContent
+    End If
+End Sub
+
+Sub runFirstBatchWarning(ByVal sheetName, ByVal colNameForBeforeBegin, ByVal colNameForPrecaution)
+    Dim found As range
+    Dim firstTobaccoName As String
+    'find today's first row
+    Set found = Sheets(sheetName).range("A:A").Find(Date, , , xlWhole)
+    If found Is Nothing Then
+        Util.showMsg "没有找到今天的日期"
+    Else
+        'get the tobacco name, run util.speakPrecation & 开始前提醒
+        firstTobaccoName = found.offset(0, 2).value
+        'Debug.Print firstTobaccoName
+        '时间使用now的话会时间转换会溢出
+        Util.shedule firstTobaccoName, Time, colNameForBeforeBegin, 0, True
+        Util.speakPrecaution firstTobaccoName, Time, colNameForPrecaution, 0, True
     End If
 End Sub
 

@@ -72,6 +72,8 @@ Private Sub Worksheet_Change(ByVal target As range)
                 Util.shedule currentTobacco, target.value, 6, 0
                 '下一批开始前提醒
                 Util.shedule nextTobacco, target.value, 4, feedLiquidSweepDelay
+                '下一批次特殊提醒
+                Util.speakPrecaution nextTobacco, target.value, "M", feedLiquidSweepDelay
             Else
                  Util.showMsg "日期并非今天, 加料结束时间不会触发语音提醒"
             End If
