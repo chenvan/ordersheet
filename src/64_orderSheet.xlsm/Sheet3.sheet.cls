@@ -33,7 +33,7 @@ Private Sub Worksheet_Change(ByVal target As range)
             
             '行的日期为今天或者是空内容时才进行提醒
             If dateOfSelectedRow = Date Or IsEmpty(dateOfSelectedRow) Then
-                Util.shedule currentTobacco, target.value, 5, 0
+                Util.shedule "加料段", currentTobacco, "开始后", target.value, 0
             Else
                 Util.showMsg "日期并非今天, 加料开始时间不会触发语音提醒"
             End If
@@ -69,11 +69,9 @@ Private Sub Worksheet_Change(ByVal target As range)
                 End If
                 
                 '批结束提醒
-                Util.shedule currentTobacco, target.value, 6, 0
+                Util.shedule "加料段", currentTobacco, "结束后", target.value, 0
                 '下一批开始前提醒
-                Util.shedule nextTobacco, target.value, 4, feedLiquidSweepDelay
-                '下一批次特殊提醒
-                Util.speakPrecaution nextTobacco, target.value, "M", feedLiquidSweepDelay
+                Util.shedule "加料段", nextTobacco, "开始前", target.value, feedLiquidSweepDelay
             Else
                  Util.showMsg "日期并非今天, 加料结束时间不会触发语音提醒"
             End If

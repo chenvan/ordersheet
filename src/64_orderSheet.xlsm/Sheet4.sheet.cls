@@ -1,3 +1,5 @@
+Option Explicit
+
 Private Sub Worksheet_Change(ByVal target As range)
     Dim timeFormatColumns As Variant
     timeFormatColumns = Array(8, 9)
@@ -34,7 +36,7 @@ Private Sub Worksheet_Change(ByVal target As range)
             
             '行的日期为今天或者是空内容时才进行提醒
             If dateOfSelectedRow = Date Or IsEmpty(dateOfSelectedRow) Then
-                Util.shedule currentTobacco, target.value, 8, 0
+                Util.shedule "切烘加香段", currentTobacco, "开始后", target.value, 0
             Else
                 Util.showMsg "日期并非今天, 加料开始时间不会触发语音提醒"
             End If
@@ -71,35 +73,17 @@ Private Sub Worksheet_Change(ByVal target As range)
                 End If
                 
                 '批结束提醒
-                Util.shedule currentTobacco, target.value, 9, 0
+                Util.shedule "切烘加香段", currentTobacco, "结束后", target.value, 0
                 '下一批开始前提醒
-                Util.shedule nextTobacco, target.value, 7, addEssenceSweepDelay
-                '下一批次特殊提醒
-                Util.speakPrecaution nextTobacco, target.value, "O", addEssenceSweepDelay
+                Util.shedule "切烘加香段", nextTobacco, "开始前", target.value, addEssenceSweepDelay
             Else
-                 Util.showMsg "日期并非今天, 加料结束时间不会触发语音提醒"
+                Util.showMsg "日期并非今天, 加料结束时间不会触发语音提醒"
             End If
         End If
     End If
 End Sub
 
-Public Sub firstBatchTip()
-'    Dim found As range
-'    Dim firstTobaccoName As String
-'    'find today's first row
-'    Set found = Sheets("切烘加香段").range("A:A").Find(Date, , , xlWhole)
-'    If found Is Nothing Then
-'        Util.showMsg "没有找到今天的日期"
-'    Else
-'        'get the tobacco name, run util.speakPrecation & 开始前提醒
-'        firstTobaccoName = found.offset(0, 2).value
-'        'Debug.Print firstTobaccoName
-'        '需要尽快提醒, 所以把delay设为负数
-'        '时间使用now的话会时间转换会溢出
-'        Util.shedule firstTobaccoName, Time, 7, -10
-'        Util.speakPrecaution firstTobaccoName, Time, "O", -15
-'    End If
-    
-    Util.runFirstBatchWarning "切烘加香段", 7, "O"
+Public Sub runFirstBatchTip()
+   Util.runFirstBatchTip "切烘加香段"
 End Sub
 

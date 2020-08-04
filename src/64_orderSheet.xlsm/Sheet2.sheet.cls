@@ -30,7 +30,7 @@ Private Sub Worksheet_Change(ByVal target As range)
    
             '行的日期为今天或者是空内容时才进行提醒
             If dateOfSelectedRow = Date Or IsEmpty(dateOfSelectedRow) Then
-                Util.shedule currentTobacco, target.value, 2, 0
+                Util.shedule "回潮段", currentTobacco, "开始后", target.value, 0
             Else
                 Util.showMsg "日期并非今天, 回潮开始时间不会触发语音提醒"
             End If
@@ -57,11 +57,9 @@ Private Sub Worksheet_Change(ByVal target As range)
             '行的日期为今天或者是空内容时才进行提醒
             If dateOfSelectedRow = Date Or IsEmpty(dateOfSelectedRow) Then
                 '批结束提醒
-                Util.shedule currentTobacco, target.value, 3, 0
+                Util.shedule "回潮段", currentTobacco, "结束后", target.value, 0
                 '下一批开始前提醒
-                Util.shedule nextTobacco, target.value, 1, 0
-                '下一批次特殊提醒
-                Util.speakPrecaution nextTobacco, target.value, "K", 0
+                Util.shedule "回潮段", nextTobacco, "开始前", target.value, 0
             Else
                  Util.showMsg "日期并非今天, 回潮结束时间不会触发语音提醒"
             End If

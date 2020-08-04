@@ -1,4 +1,7 @@
 Attribute VB_Name = "Tobacco"
+Option Explicit
+
+
 Function ParseInputCode(inputCode As String) As String()
     Dim parsedResult(0 To 2) As String
     

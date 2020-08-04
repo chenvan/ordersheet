@@ -1,6 +1,12 @@
+Option Explicit
+
 Private Sub Workbook_Open()
+    '自动备份
+    
     Application.OnTime TimeValue("12:10:00"), "AutoBackup.AutoBackup"
     Application.OnTime TimeValue("22:10:00"), "AutoBackup.AutoBackup"
+    
+    Util.loadDefaultTips
 End Sub
 
 Private Sub Workbook_SheetChange(ByVal Sh As Object, ByVal target As range)
@@ -8,13 +14,12 @@ Private Sub Workbook_SheetChange(ByVal Sh As Object, ByVal target As range)
     Dim settingSheetName As String
     
     sheetNames = Array("切烘加香段", "回潮段", "加料段", "HDT段")
-    sheetNameWithCode = "设定"
     
     If Not IsArray(target.value) Then
         
         If Util.IsInArray(Sh.Name, sheetNames) And target.Column = 4 And Util.IsNum(target.value) Then
             Dim tobaccoCode As String
-            tobaccoCode = Tobacco.GetTobaccoCode(target.offset(0, -1).value, sheetNameWithCode)
+            tobaccoCode = Tobacco.GetTobaccoCode(target.offset(0, -1).value, "设定")
             
             If tobaccoCode <> "" Then
                 Dim segments() As String
@@ -41,8 +46,3 @@ Private Sub Workbook_SheetSelectionChange(ByVal Sh As Object, ByVal target As ra
     
 End Sub
 
-Public Sub showHidden()
-    For Each itemName In ActiveWorkbook.Names
-        itemName.Visible = True
-    Next
-End Sub
