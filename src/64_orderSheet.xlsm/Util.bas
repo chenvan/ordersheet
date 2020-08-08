@@ -1,6 +1,6 @@
 Attribute VB_Name = "Util"
 'Option Explicit
-Global defaultTips As Object
+
 
 Function IsInArray(beFound As Variant, arr As Variant) As Boolean
     Dim i As Integer
@@ -116,7 +116,10 @@ End Sub
 
 Sub shedule(ByVal sheetName As String, ByVal tobaccoName As String, ByVal producePhase As String, ByVal baseTime As Variant, ByVal delay As Integer)
     Dim tipPair As Object
-    Dim tobaccoTips As Object
+    Dim tobaccoTips, defaultTips As Object
+    
+    Set defaultTips = Util.loadDefaultTips
+    Util.showMsg "载入 default 提示文件"
     
     For Each tipPair In defaultTips(sheetName)(producePhase)
         'Debug.Print tipPair("延时") & ", " & tipPair("内容")
@@ -132,6 +135,19 @@ Sub shedule(ByVal sheetName As String, ByVal tobaccoName As String, ByVal produc
         loadTip tipPair("内容"), tipPair("延时") + delay, baseTime
     Next tipPair
     
+End Sub
+
+Sub sheduleDestTips(ByVal sheetName As String, ByVal cabinetName As String, ByVal baseTime As Variant)
+    Dim tipPair As Object
+    Dim destTips As Variant
+    
+    Set destTips = loadCabinetTips(cabinetName, sheetName)
+    Util.showMsg "载入 cabinet 提示文件"
+    
+    For Each tipPair In destTips
+        'Debug.Print tipPair("延时") & ", " & tipPair("内容")
+        loadTip tipPair("内容"), tipPair("延时"), baseTime
+    Next tipPair
 End Sub
 
 
@@ -171,14 +187,14 @@ Sub runFirstBatchTip(ByVal sheetName As String)
     End If
 End Sub
 
-Public Sub loadDefaultTips()
+Public Function loadDefaultTips() As Object
     Dim path As String
-    
+
     path = "C:\Users\AWang\code\orderSheet\defaultTips.json"
 
-    Set defaultTips = loadJsonFile(path)
-    Util.showMsg "载入默认提示文件"
-End Sub
+    Set loadDefaultTips = loadJsonFile(path)
+
+End Function
 
 Function loadTobaccoTips(ByVal tobaccoName As String) As Object
     Dim path As String
@@ -189,6 +205,20 @@ Function loadTobaccoTips(ByVal tobaccoName As String) As Object
     Set allTobaccoTips = loadJsonFile(path)
     
     Set loadTobaccoTips = allTobaccoTips(tobaccoName)
+End Function
+
+Function loadCabinetTips(ByVal cabinetName As String, ByVal sheetName As String) As Variant
+    Dim path As String
+    Dim cabinetTips As Object
+    Dim mark As String
+    
+    path = "C:\Users\AWang\code\orderSheet\cabinetTips.json"
+    
+    Set cabinetTips = loadJsonFile(path)
+    mark = cabinetTips(sheetName)(cabinetName)
+    
+    '返回的是array
+    Set loadCabinetTips = cabinetTips(sheetName)(mark)
 End Function
 
 Function loadJsonFile(ByVal path As String) As Object

@@ -6,7 +6,7 @@ Private Sub Worksheet_Change(ByVal target As range)
     
     If Not IsArray(target.value) Then
     
-        Dim currentTobacco, nextTobacco As String
+        Dim currentTobacco, nextTobacco, dest As String
         Dim dateOfSelectedRow As Variant
         Dim beginTimeColumn, endTimeColumn As Integer
         beginTimeColumn = 8
@@ -30,15 +30,20 @@ Private Sub Worksheet_Change(ByVal target As range)
             
             currentTobacco = target.offset(0, 3 - target.Column).value
             dateOfSelectedRow = target.offset(0, 1 - target.Column).value
-            
+            dest = target.offset(0, 7 - target.Column).value
             'Debug.Print (currentTobacco)
             'Debug.Print dateOfSelectedRow
             
             '行的日期为今天或者是空内容时才进行提醒
             If dateOfSelectedRow = Date Or IsEmpty(dateOfSelectedRow) Then
+                If dest = "" Then
+                    Util.speakAsync "补全入柜信息, 并重新填写烘丝开始时间"
+                    Exit Sub
+                End If
                 Util.shedule "切烘加香段", currentTobacco, "开始后", target.value, 0
+                Util.sheduleDestTips "切烘加香段", dest, target.value
             Else
-                Util.showMsg "日期并非今天, 加料开始时间不会触发语音提醒"
+                Util.showMsg "日期并非今天, 烘丝开始时间不会触发语音提醒"
             End If
             
         End If
@@ -77,7 +82,7 @@ Private Sub Worksheet_Change(ByVal target As range)
                 '下一批开始前提醒
                 Util.shedule "切烘加香段", nextTobacco, "开始前", target.value, addEssenceSweepDelay
             Else
-                Util.showMsg "日期并非今天, 加料结束时间不会触发语音提醒"
+                Util.showMsg "日期并非今天, 烘丝结束时间不会触发语音提醒"
             End If
         End If
     End If
