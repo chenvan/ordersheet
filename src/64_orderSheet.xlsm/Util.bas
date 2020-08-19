@@ -119,7 +119,7 @@ Sub shedule(ByVal sheetName As String, ByVal tobaccoName As String, ByVal produc
     Dim tobaccoTips, defaultTips As Object
     
     Set defaultTips = Util.loadDefaultTips
-    Util.showMsg "载入 default 提示文件"
+    'Util.showMsg "载入 default 提示文件"
     
     For Each tipPair In defaultTips(sheetName)(producePhase)
         'Debug.Print tipPair("延时") & ", " & tipPair("内容")
@@ -128,7 +128,7 @@ Sub shedule(ByVal sheetName As String, ByVal tobaccoName As String, ByVal produc
     
     'load tobacco tips
     Set tobaccoTips = Util.loadTobaccoTips(tobaccoName)
-    Util.showMsg "载入 " & tobaccoName & " 提示文件"
+    'Util.showMsg "载入 " & tobaccoName & " 提示文件"
 
     For Each tipPair In tobaccoTips(sheetName)(producePhase)
         'Debug.Print tipPair("延时") & ", " & tipPair("内容")
@@ -142,7 +142,7 @@ Sub sheduleDestTips(ByVal sheetName As String, ByVal cabinetName As String, ByVa
     Dim destTips As Variant
     
     Set destTips = loadCabinetTips(cabinetName, sheetName)
-    Util.showMsg "载入 cabinet 提示文件"
+    'Util.showMsg "载入 cabinet 提示文件"
     
     For Each tipPair In destTips
         'Debug.Print tipPair("延时") & ", " & tipPair("内容")
@@ -190,7 +190,7 @@ End Sub
 Public Function loadDefaultTips() As Object
     Dim path As String
 
-    path = "C:\Users\AWang\code\orderSheet\defaultTips.json"
+    path = getBasePathOfTips() & "\defaultTips.json"
 
     Set loadDefaultTips = loadJsonFile(path)
 
@@ -200,7 +200,7 @@ Function loadTobaccoTips(ByVal tobaccoName As String) As Object
     Dim path As String
     Dim allTobaccoTips As Object
     
-    path = "C:\Users\AWang\code\orderSheet\tobaccoTips.json"
+    path = getBasePathOfTips() & "\tobaccoTips.json"
     
     Set allTobaccoTips = loadJsonFile(path)
     
@@ -212,7 +212,7 @@ Function loadCabinetTips(ByVal cabinetName As String, ByVal sheetName As String)
     Dim cabinetTips As Object
     Dim mark As String
     
-    path = "C:\Users\AWang\code\orderSheet\cabinetTips.json"
+    path = getBasePathOfTips() & "\cabinetTips.json"
     
     Set cabinetTips = loadJsonFile(path)
     mark = cabinetTips(sheetName)(cabinetName)
@@ -232,6 +232,19 @@ Function loadJsonFile(ByVal path As String) As Object
     
     Set loadJsonFile = JsonConverter.ParseJson(JsonText)
 End Function
+
+Function findInColumn(sheetName As String, rangeName As String, target As String) As range
+    Set findInColumn = Sheets(sheetName).range(rangeName).Find(target, , , xlWhole)
+End Function
+
+Function getBasePathOfTips() As String
+    Dim found As range
+    Set found = findInColumn("设定", "A:A", "语音文件路径")
+    
+    getBasePathOfTips = found.offset(0, 1).value
+End Function
+
+
 
 
 
