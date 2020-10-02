@@ -19,11 +19,11 @@ Private Sub Workbook_SheetChange(ByVal Sh As Object, ByVal target As range)
         
         If Util.IsInArray(Sh.Name, sheetNames) And target.Column = 4 And Util.IsNum(target.value) Then
             Dim tobaccoCode As String
-            tobaccoCode = Tobacco.GetTobaccoCode(target.offset(0, -1).value, "设定")
+            tobaccoCode = tobacco.GetTobaccoCode(target.offset(0, -1).value, "设定")
             
             If tobaccoCode <> "" Then
                 Dim segments() As String
-                segments = Tobacco.ParseInputCode(target.value)
+                segments = tobacco.ParseInputCode(target.value)
                 
                 If Not Util.IsInArray("", segments) Then
                     target.value = segments(0) & segments(1) & tobaccoCode & segments(2)

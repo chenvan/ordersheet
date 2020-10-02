@@ -1,8 +1,7 @@
 Attribute VB_Name = "Util"
-'Option Explicit
+Option Explicit
 
-
-Function IsInArray(beFound As Variant, arr As Variant) As Boolean
+Function IsInArray(ByVal beFound As Variant, ByRef arr As Variant) As Boolean
     Dim i As Integer
     
     For i = LBound(arr) To UBound(arr)
@@ -85,16 +84,7 @@ Sub clearContent()
 End Sub
 
 Sub speakLater(ByVal laterTime As Variant, ByVal content As String)
-    '如果安排的时间已经过了,应该立即进行语音提醒
-    'Debug.Print Time
-    'Debug.Print laterTime
-    If Time >= laterTime Then
-        'Debug.Print "超时"
-        content = "超时," & content
-        Application.OnTime Now, "'speakAsync """ & content & "'"
-    Else
-        Application.OnTime laterTime, "'speakAsync """ & content & "'"
-    End If
+    Application.OnTime laterTime, "'speakAsync """ & content & "'"
 End Sub
 
 Sub speakAsync(ByVal content As String)
@@ -102,70 +92,123 @@ Sub speakAsync(ByVal content As String)
 End Sub
 
 Sub showMsgLater(ByVal laterTime As Variant, ByVal content As String)
-    If Time >= laterTime Then
-        content = "超时," & content
-        Application.OnTime Now, "'showMsg """ & content & "'"
-    Else
-        Application.OnTime laterTime, "'showMsg """ & content & "'"
-    End If
+    Application.OnTime laterTime, "'showMsg """ & content & "'"
 End Sub
 
 Sub showMsg(ByVal content As String)
     Application.StatusBar = "##" & content & "   " & Left(Application.StatusBar, 80)
 End Sub
 
-Sub shedule(ByVal sheetName As String, ByVal tobaccoName As String, ByVal producePhase As String, ByVal baseTime As Variant, ByVal delay As Integer)
-    Dim tipPair As Object
-    Dim tobaccoTips, defaultTips As Object
+Sub sheduleVoiceTips(ByVal sheetName As String, ByVal tobaccoName As String, ByVal producePhase As String, ByVal baseTime As Variant, ByVal delay As Integer)
     
-    Set defaultTips = Util.loadDefaultTips
-    'Util.showMsg "载入 default 提示文件"
+    Dim tipArray As Variant
+    Dim tipSet As Scripting.Dictionary
+    Dim realContent As String
+    Dim realOffsetTime As Variant
     
-    For Each tipPair In defaultTips(sheetName)(producePhase)
-        'Debug.Print tipPair("延时") & ", " & tipPair("内容")
-        loadTip tipPair("内容"), tipPair("延时") + delay, baseTime
-    Next tipPair
+    '通过sheetName, producePhase加载所需的语音列表
+    Set tipArray = loadTips(sheetName, producePhase)
+    '遍历列表, 检查是否需要改变时间
     
-    'load tobacco tips
-    Set tobaccoTips = Util.loadTobaccoTips(tobaccoName)
-    'Util.showMsg "载入 " & tobaccoName & " 提示文件"
-
-    For Each tipPair In tobaccoTips(sheetName)(producePhase)
-        'Debug.Print tipPair("延时") & ", " & tipPair("内容")
-        loadTip tipPair("内容"), tipPair("延时") + delay, baseTime
-    Next tipPair
+    For Each tipSet In tipArray
+        '检查内容是否需要重置
+        If tipSet.Exists("redirect") Then
+            realContent = genNewContent(tobaccoName, tipSet("redirect"))
+        ElseIf tipSet.Exists("hdt") Then
+            '检查是否需要回掺HDT
+            If getParam(tobaccoName, "HDT掺配比例") = "" Then GoTo Continue
+            realContent = tipSet("hdt")
+        Else
+            realContent = tipSet("content")
+        End If
+        
+        '检查时间是否需要重置
+        If tipSet.Exists("aOffsetTime") Then
+            realOffsetTime = adjustOffsetTime(tobaccoName, tipSet("aOffsetTime"))
+        Else
+            realOffsetTime = tipSet("sOffsetTime")
+        End If
+        
+        'Debug.Print realContent
+        
+        '装载语音
+        pushVoiceTip realContent, realOffsetTime + delay, baseTime, tipSet("isForceBroadcast")
+       
+Continue:
+    Next tipSet
     
 End Sub
 
-Sub sheduleDestTips(ByVal sheetName As String, ByVal cabinetName As String, ByVal baseTime As Variant)
-    Dim tipPair As Object
-    Dim destTips As Variant
+Sub sheduleVoiceTipsAboutStore(ByVal storePlace As String, ByVal tobaccoName As String, ByVal storeName As String, ByVal baseTime As Variant, ByVal delay As Integer)
+    Dim tipArray As Variant
+    Dim tipSet As Scripting.Dictionary
+    Dim realOffsetTime As Variant
+    Dim realStore As String
     
-    Set destTips = loadCabinetTips(cabinetName, sheetName)
-    'Util.showMsg "载入 cabinet 提示文件"
+    If storePlace = "贮叶柜" Then
+        '加载加料入柜tips
+        Dim storeNamesInfeedLiquid As Variant
     
-    For Each tipPair In destTips
-        'Debug.Print tipPair("延时") & ", " & tipPair("内容")
-        loadTip tipPair("内容"), tipPair("延时"), baseTime
-    Next tipPair
+        storesInFeedLiquid = Array("1", "2", "3", "4", "5", "6")
+        realStore = "HDT"
+        
+        If IsInArray(storeName, storesInFeedLiquid) Then
+            realStore = "叶柜"
+        End If
+        
+    Else
+        '加载切烘入柜tips
+        Dim storesInAddEssence As Variant
+        Dim storeIndex As Integer
+        
+        storesInAddEssence = Array("南A", "南B", "南C", "南D", "南E", "南F", "南G", "南H", "南J", "南K", "南L", "南M", "南N", "南P", "南Q", "南R", "南S", "南T", "木A", "木B", "木C", "北A", "北B", "北C", "北D", "北E", "北F", "北G", "北H", "外A", "外B")
+        storeIndex = Application.Match(storeName, storesInAddEssence, False)
+        
+        realStore = "南AF"
+        
+        If storeIndex > 6 And storeIndex < 13 Then
+            realStore = "南GM"
+        ElseIf storeIndex > 12 And storeIndex <= 18 Then
+            realStore = "南NT"
+        ElseIf storeIndex > 18 And storeIndex <= 21 Then
+            realStore = "木AC"
+        ElseIf storeIndex > 21 And storeIndex <= 25 Then
+            realStore = "北AD"
+        ElseIf storeIndex > 25 And storeIndex <= 29 Then
+            realStore = "北EH"
+        ElseIf storeIndex > 29 And storeIndex <= 31 Then
+            realStore = "外AB"
+        End If
+    End If
+    
+    Set tipArray = loadTips(storePlace, realStore)
+    
+    For Each tipSet In tipArray
+        If tipSet.Exists("aOffsetTime") Then
+            realOffsetTime = adjustOffsetTime(tobaccoName, tipSet("aOffsetTime"))
+        Else
+            realOffsetTime = tipSet("sOffsetTime")
+        End If
+        
+        pushVoiceTip tipSet("content"), realOffsetTime + delay, baseTime, tipSet("isForceBroadcast")
+    
+    Next tipSet
 End Sub
 
-
-Sub loadTip(ByVal content As String, ByVal tsOffset, ByVal baseTime As Variant)
+Sub pushVoiceTip(ByVal content As String, ByVal tsOffset, ByVal baseTime As Variant, ByVal isForceBroadcast As Boolean)
 
     Dim triggerTime As Variant
-    Dim timeDiffInMin As Integer
-    Dim latestTime As Integer
-    
+
     triggerTime = baseTime + TimeSerial(0, tsOffset, 2)
-    timeDiffInMin = (triggerTime - Time) * 1440
-    latestTime = -11
-    
-    If timeDiffInMin > latestTime Then
+
+    If Time > triggerTime And isForceBroadcast Then
+        speakLater Now, content
+        showMsgLater Now, content
+    ElseIf Time <= triggerTime Then
         speakLater triggerTime, content
         showMsgLater triggerTime, content
     Else
-        showMsg "超时大于" & Abs(latestTime) - 1 & "分钟, 不会进行语音提醒, $" & content
+        showMsg "超时,不进行以下提醒: $" & content
     End If
 End Sub
 
@@ -173,55 +216,29 @@ Sub runFirstBatchTip(ByVal sheetName As String)
     Dim found As range
     Dim firstTobaccoName As String
     'find today's first row
-    Set found = Sheets(sheetName).range("A:A").Find(Date, , , xlWhole)
+    Set found = Sheets(sheetName).range("A:A").Find(Date)
+    
     If found Is Nothing Then
         Util.showMsg "没有找到今天的日期"
     Else
-        'get the tobacco name, run util.speakPrecation & 开始前提醒
         firstTobaccoName = found.offset(0, 2).value
-        'Debug.Print firstTobaccoName
         '时间使用now的话会时间转换会溢出
-'        Debug.Print sheetName
-'        Debug.Print firstTobaccoName
-        Util.shedule sheetName, firstTobaccoName, "第一批", Time, 0
+        sheduleVoiceTips sheetName, firstTobaccoName, "第一批", Time, 0
     End If
 End Sub
 
-Public Function loadDefaultTips() As Object
-    Dim path As String
-
-    path = getBasePathOfTips() & "\defaultTips.json"
-
-    Set loadDefaultTips = loadJsonFile(path)
-
+Public Function loadTips(ByVal fLayerP As String, ByVal sLayerP As String) As Variant
+    Dim fullPath As String
+    Dim allTips As Scripting.Dictionary
+    
+    fullPath = Sheets("设定").range("A:A").Find("语音文件路径").offset(0, 1).value
+    
+    Set allTips = loadJsonFile(fullPath)
+    
+    Set loadTips = allTips(fLayerP)(sLayerP)
 End Function
 
-Function loadTobaccoTips(ByVal tobaccoName As String) As Object
-    Dim path As String
-    Dim allTobaccoTips As Object
-    
-    path = getBasePathOfTips() & "\tobaccoTips.json"
-    
-    Set allTobaccoTips = loadJsonFile(path)
-    
-    Set loadTobaccoTips = allTobaccoTips(tobaccoName)
-End Function
-
-Function loadCabinetTips(ByVal cabinetName As String, ByVal sheetName As String) As Variant
-    Dim path As String
-    Dim cabinetTips As Object
-    Dim mark As String
-    
-    path = getBasePathOfTips() & "\cabinetTips.json"
-    
-    Set cabinetTips = loadJsonFile(path)
-    mark = cabinetTips(sheetName)(cabinetName)
-    
-    '返回的是array
-    Set loadCabinetTips = cabinetTips(sheetName)(mark)
-End Function
-
-Function loadJsonFile(ByVal path As String) As Object
+Function loadJsonFile(ByVal path As String) As Variant
     Dim fso As New FileSystemObject
     Dim JsonTS As TextStream
     Dim JsonText As String
@@ -233,23 +250,32 @@ Function loadJsonFile(ByVal path As String) As Object
     Set loadJsonFile = JsonConverter.ParseJson(JsonText)
 End Function
 
-Function findInColumn(sheetName As String, rangeName As String, target As String) As range
-    Set findInColumn = Sheets(sheetName).range(rangeName).Find(target, , , xlWhole)
-End Function
-
-Function getBasePathOfTips() As String
-    Dim found As range
-    Set found = findInColumn("设定", "A:A", "语音文件路径")
+Function getParam(ByVal tobaccoName As String, ByVal paramName As String) As Variant
+    Dim rowIndex, columnIndex As Integer
     
-    getBasePathOfTips = found.offset(0, 1).value
+    rowIndex = Sheets("设定").range("A2:A18").Find(tobaccoName).Row
+    columnIndex = Sheets("设定").range("A1:Z1").Find(paramName).Column
+    
+    getParam = Sheets("设定").Cells(rowIndex, columnIndex)
+End Function
+
+Function genNewContent(ByVal tobaccoName As String, ByVal paramName As String) As String
+    Dim param As String
+    
+    param = getParam(tobaccoName, paramName)
+    
+    genNewContent = paramName & param
+
 End Function
 
 
-
-
-
-
-
+Function adjustOffsetTime(ByVal tobaccoName As String, ByVal offsetTime As Integer) As Integer
+    Dim mainTobaccoVolume As Integer
+    
+    mainTobaccoVolume = getParam(tobaccoName, "主叶丝秤流量")
+    
+    adjustOffsetTime = offsetTime * 6250 / mainTobaccoVolume
+End Function
 
 
 

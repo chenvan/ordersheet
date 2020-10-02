@@ -6,7 +6,7 @@ Private Sub Worksheet_Change(ByVal target As range)
     
     If Not IsArray(target.value) Then
     
-        Dim currentTobacco, nextTobacco, dest As String
+        Dim currentTobacco, nextTobacco As String
         Dim dateOfSelectedRow As Variant
         Dim beginTimeColumn, endTimeColumn As Integer
         beginTimeColumn = 8
@@ -27,21 +27,22 @@ Private Sub Worksheet_Change(ByVal target As range)
         
         If target.Column = beginTimeColumn And Util.IsNum(target.value) Then
             '开始时间列触发批开始语音提醒
+            Dim storeName As String
             
             currentTobacco = target.offset(0, 3 - target.Column).value
             dateOfSelectedRow = target.offset(0, 1 - target.Column).value
-            dest = target.offset(0, 7 - target.Column).value
+            storeName = target.offset(0, 7 - target.Column).value
             'Debug.Print (currentTobacco)
             'Debug.Print dateOfSelectedRow
             
             '行的日期为今天或者是空内容时才进行提醒
             If dateOfSelectedRow = Date Or IsEmpty(dateOfSelectedRow) Then
-                If dest = "" Then
+                If storeName = "" Then
                     Util.speakAsync "补全入柜信息, 并重新填写烘丝开始时间"
                     Exit Sub
                 End If
-                Util.shedule "切烘加香段", currentTobacco, "开始后", target.value, 0
-                Util.sheduleDestTips "切烘加香段", dest, target.value
+                Util.sheduleVoiceTips "切烘加香", currentTobacco, "开始后", target.value, 0
+                Util.sheduleVoiceTipsAboutStore "贮丝柜", currentTobacco, storeName, target.value, 0
             Else
                 Util.showMsg "日期并非今天, 烘丝开始时间不会触发语音提醒"
             End If
@@ -78,9 +79,9 @@ Private Sub Worksheet_Change(ByVal target As range)
                 End If
                 
                 '批结束提醒
-                Util.shedule "切烘加香段", currentTobacco, "结束后", target.value, 0
+                Util.sheduleVoiceTips "切烘加香", currentTobacco, "结束后", target.value, 0
                 '下一批开始前提醒
-                Util.shedule "切烘加香段", nextTobacco, "开始前", target.value, addEssenceSweepDelay
+                Util.sheduleVoiceTips "切烘加香", nextTobacco, "开始前", target.value, addEssenceSweepDelay
             Else
                 Util.showMsg "日期并非今天, 烘丝结束时间不会触发语音提醒"
             End If
@@ -89,6 +90,6 @@ Private Sub Worksheet_Change(ByVal target As range)
 End Sub
 
 Public Sub runFirstBatchTip()
-   Util.runFirstBatchTip "切烘加香段"
+   Util.runFirstBatchTip "切烘加香"
 End Sub
 

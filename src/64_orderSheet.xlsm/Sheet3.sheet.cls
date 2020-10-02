@@ -4,7 +4,7 @@ Private Sub Worksheet_Change(ByVal target As range)
     
     If Not IsArray(target.value) Then
         Dim beginTimeColumn, endTimeColumn As Integer
-        Dim currentTobacco, nextTobacco, dest As String
+        Dim currentTobacco, nextTobacco As String
         Dim dateOfSelectedRow As Variant
 
         beginTimeColumn = 8
@@ -24,26 +24,26 @@ Private Sub Worksheet_Change(ByVal target As range)
         
         If target.Column = beginTimeColumn And Util.IsNum(target.value) Then
             '开始时间列触发批开始语音提醒
+            Dim storeName As String
             
             currentTobacco = target.offset(0, 3 - target.Column).value
             dateOfSelectedRow = target.offset(0, 1 - target.Column).value
-            dest = target.offset(0, 7 - target.Column).value
+            storeName = target.offset(0, 7 - target.Column).value
             
             'Debug.Print (currentTobacco)
             'Debug.Print dateOfSelectedRow
-            'Debug.Print "贮叶柜: " & dest
+            'Debug.Print "贮叶柜: " & storeName
             
             '行的日期为今天或者是空内容时才进行提醒
             If dateOfSelectedRow = Date Or IsEmpty(dateOfSelectedRow) Then
                 
-                If dest = "" Then
+                If storeName = "" Then
                     Util.speakAsync "补全储叶柜, 并重新填写加料开始时间"
                     Exit Sub
                 End If
-                
-                Util.shedule "加料段", currentTobacco, "开始后", target.value, 0
+                Util.sheduleVoiceTips "加料", currentTobacco, "开始后", target.value, 0
                 '入柜提醒
-                Util.sheduleDestTips "加料段", dest, target.value
+                Util.sheduleVoiceTipsAboutStore "贮叶柜", currentTobacco, storeName, target.value, 0
             Else
                 Util.showMsg "日期并非今天, 加料开始时间不会触发语音提醒"
             End If
@@ -79,13 +79,17 @@ Private Sub Worksheet_Change(ByVal target As range)
                 End If
                 
                 '批结束提醒
-                Util.shedule "加料段", currentTobacco, "结束后", target.value, 0
+                Util.sheduleVoiceTips "加料", currentTobacco, "结束后", target.value, 0
                 '下一批开始前提醒
-                Util.shedule "加料段", nextTobacco, "开始前", target.value, feedLiquidSweepDelay
+                Util.sheduleVoiceTips "加料", nextTobacco, "开始前", target.value, feedLiquidSweepDelay
             Else
                  Util.showMsg "日期并非今天, 加料结束时间不会触发语音提醒"
             End If
             
         End If
     End If
+End Sub
+
+Public Sub runFirstBatchTip()
+   Util.runFirstBatchTip "加料"
 End Sub

@@ -1,11 +1,12 @@
 Attribute VB_Name = "AutoBackup"
+Option Explicit
+
 Sub AutoBackup()
     Dim fso As Object
-    Dim backupPath As String
-    Dim tipsBasePath As String
+    Dim backupPath, tipsPath As String
     
     backupPath = "C:\备份"
-    tipsBasepaht = Util.getBasePathOfTips()
+    tipsPath = Sheets("设定").range("A:A").Find("语音文件路径").offset(0, 1).value
     
     If Dir(backupPath, vbDirectory) = vbNullString Then
         MsgBox backupPath & " 路径不存在"
@@ -16,10 +17,8 @@ Sub AutoBackup()
     
     Set fso = vab.CreateObject("Scripting.FileSystemObject")
     
-    For Each fName In Array("defaultTips.json", "tobaccoTips.json", "cabinetTips.json")
-        Call fso.CopyFile(tipsBasePath & "\" & fName, backupPath & "\" & ThisWorkbook.Name & "_" & fName, True)
-    Next
-    
+    Call fso.CopyFile(tipsBasePath, backupPath & "\" & ThisWorkbook.Name & "_tips_backup.json", True)
+
 End Sub
 
 
