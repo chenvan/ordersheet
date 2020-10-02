@@ -56,24 +56,6 @@
 
 
 
-### 通用提醒
-
-与机器相关的提醒
-
-
-
-### 与牌号相关的提醒
-
-牌号的工艺参数与其他设置
-
-
-
-### 柜的提醒
-
-不同的柜不同的延时
-
-
-
 ### 其他
 
 加料批次的转烟时间, 同批次的转烟时间要20分钟左右, 不同批次的要分钟30左右
@@ -93,7 +75,7 @@
 
 
 
-## 状态栏文字提醒
+##状态栏文字提醒
 
 类似FIFO的列表
 
@@ -115,13 +97,11 @@ HDT段的表先改为不保护的状态(未完成)
 
 
 
-####文件结构
+###文件结构
 
 回潮: {
 
 ​		第一批: [Node, ...],
-
-},
 
 ​		开始前: [Node, ...],
 
@@ -181,27 +161,39 @@ HDT段的表先改为不保护的状态(未完成)
 
 
 
-####Node的结构
+###Node的结构
 
 {
 
-​		offsetTime: int,
+​		sOffsetTime*: int,
+
+​		aOffsetTime*: int,
 
 ​		isForceBroadcast: boolen,
 
-​		isRedirect: boolen,
+​        redirect*: string, 
 
-​        redirectIndex*: string, (isRedirect 是 true 时, 才有 redirectIndex)
+​		hdt*: string
 
-​		content*: string (isRedirect 是 false 时, 肯定有 content, 是 true 时则不一定)
+​		content*: string 
 
 }
 
 isForceBroadcast 是 true, 则超时也需要播报该语音
 
-isRedirect 是 true, 用牌号 和 redirectIndex 作为索引检索数据, 如果索引成功, 则看是否有 content 属性, 有的话播报 content(解决掺HDT的播报), 没有的话用 牌号 + redirectIndex + 检索的数据 作为新的 content 
+sOffsetTime与aOffsetTime两者只会有一
 
-如果是切烘段, delay时间还需要根据主叶丝秤流量, 膨丝流量, 梗丝流量进行变换
+sOffsetTime是固定的偏移时间
+
+aOffsetTime则需要经过主叶丝秤流量进行变换(输送带的速度没有改变, 主要是填满主叶丝暂存柜需要的时间不同)
+
+redirect, hdt与content三者只会有一
+
+存在redirect. 用redirect, 牌号找到需要的参数, 用参数生成新的内容
+
+存在hdtContent. 用牌号检查是否需要回掺HDT, 需要回掺则使用hdtContent
+
+存在content. 直接使用
 
 
 
@@ -211,14 +203,23 @@ JSON 文件的编码需要是 ANSI, 否则中文会变为乱码且无法正确�
 
 
 
-## 可能存在的Bug
+##如何改变偏移时间
+
+***使用双喜(经典)的偏移时间作为基准***
+
+主叶丝秤之后的语音偏移时间才需要改变
+
+adjustOffsetTime = offsetTime * 6250 / 主叶丝秤流量 
+
+
+
+##Error的处理
+
+
+
+##可能存在的Bug
 
 晚上加班可能会让时间函数判断不用提醒
-
-
-
-
-
 
 
 

@@ -1,0 +1,145 @@
+{
+	"回潮": {
+		"第一批": [
+		
+		],
+		"开始前": [
+		
+		],
+		"开始后": [
+		
+		],
+		"结束后": [
+		
+		]
+	},
+	"加料": {
+		"第一批": [
+		
+		],
+		"开始前": [
+			{
+				"sOffsetTime": 1,
+				"isForceBroadcast": true,
+				"redirect": "加料比例"
+			},
+			{
+				"sOffsetTime": 2,
+				"isForceBroadcast": true,
+				"content": "记得填写加料开始时间"
+			}
+		],
+		"开始后": [
+			{
+				"sOffsetTime": 1,
+				"isForceBroadcast": false,
+				"content": "开始后"
+			}
+		],
+		"结束后": [
+			{
+				"sOffsetTime": 1,
+				"isForceBroadcast": false,
+				"content": "结束后"
+			}
+		]
+	},
+	"切烘加香": {
+		"第一批": [
+		
+		],
+		"开始前": [
+			{
+				"sOffsetTime": 1,
+				"isForceBroadcast": true,
+				"redirect": "主叶丝秤流量"
+			}
+		],
+		"开始后": [
+			{
+				"sOffsetTime": 1,
+				"isForceBroadcast": true,
+				"hdt": "HDT出柜"
+			},
+			{
+				"aOffsetTime": 2,
+				"isForceBroadcast": true,
+				"content": "主叶丝秤上烟"
+			}
+		],
+		"结束后": [
+			{
+				"aOffsetTime": 1,
+				"isForceBroadcast": true,
+				"content": "变异系数"
+			}
+		]
+	},
+	"贮叶柜": {
+		"叶柜": [
+			{
+				"sOffsetTime": 1,
+				"isForceBroadcast": true,
+				"content": "叶柜"
+			}
+		],
+		"HDT": [
+			{
+				"sOffsetTime": 1,
+				"isForceBroadcast": true,
+				"content": "HDT柜"
+			}
+		]
+	},
+	"贮丝柜": {
+		"南AF": [
+			{
+				"aOffsetTime": 1,
+				"isForceBroadcast": true,
+				"content": "南AF"
+			}
+		],
+		"南GM": [
+			{
+				"aOffsetTime": 1,
+				"isForceBroadcast": true,
+				"content": "南GM"
+			}
+		],
+		"南NT": [
+			{
+				"aOffsetTime": 1,
+				"isForceBroadcast": true,
+				"content": "南NT"
+			}
+		],
+		"木AC": [
+			{
+				"aOffsetTime": 1,
+				"isForceBroadcast": true,
+				"content": "木AC"
+			}
+		],
+		"北AD": [
+			{
+				"aOffsetTime": 1,
+				"isForceBroadcast": true,
+				"content": "北AD"
+			}
+		],
+		"北EH": [
+			{
+				"aOffsetTime": 1,
+				"isForceBroadcast": true,
+				"content": "北EH"
+			}
+		],
+		"外AB": [
+			{
+				"aOffsetTime": 1,
+				"isForceBroadcast": true,
+				"content": "外AB"
+			}
+		]
+	}
+}
