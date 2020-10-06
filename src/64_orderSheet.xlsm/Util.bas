@@ -147,7 +147,7 @@ Sub sheduleVoiceTipsAboutStore(ByVal storePlace As String, ByVal tobaccoName As 
     
     If storePlace = "贮叶柜" Then
         '加载加料入柜tips
-        Dim storeNamesInfeedLiquid As Variant
+        Dim storesInFeedLiquid As Variant
     
         storesInFeedLiquid = Array("1", "2", "3", "4", "5", "6")
         realStore = "HDT"
@@ -228,14 +228,19 @@ Sub runFirstBatchTip(ByVal sheetName As String)
 End Sub
 
 Public Function loadTips(ByVal fLayerP As String, ByVal sLayerP As String) As Variant
+    On Error GoTo EH
+    
     Dim fullPath As String
     Dim allTips As Scripting.Dictionary
     
     fullPath = Sheets("设定").range("A:A").Find("语音文件路径").offset(0, 1).value
     
     Set allTips = loadJsonFile(fullPath)
-    
     Set loadTips = allTips(fLayerP)(sLayerP)
+    
+    Exit Function
+EH:
+    MsgBox Err.Description & vbCrLf & "在JSON文件中无法找到: " & fLayerP & " -> " & sLayerP & " 属性"
 End Function
 
 Function loadJsonFile(ByVal path As String) As Variant
@@ -251,12 +256,18 @@ Function loadJsonFile(ByVal path As String) As Variant
 End Function
 
 Function getParam(ByVal tobaccoName As String, ByVal paramName As String) As Variant
-    Dim rowIndex, columnIndex As Integer
+    On Error GoTo EH
     
+    Dim rowIndex, columnIndex As Integer
+ 
     rowIndex = Sheets("设定").range("A2:A18").Find(tobaccoName).Row
     columnIndex = Sheets("设定").range("A1:Z1").Find(paramName).Column
     
     getParam = Sheets("设定").Cells(rowIndex, columnIndex)
+    
+    Exit Function
+EH:
+    MsgBox Err.Description & vbCrLf & "在设定表中无法找到: " & tobaccoName & " -> " & paramName & " 参数"
 End Function
 
 Function genNewContent(ByVal tobaccoName As String, ByVal paramName As String) As String

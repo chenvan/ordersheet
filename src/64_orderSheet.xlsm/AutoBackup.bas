@@ -15,9 +15,9 @@ Sub AutoBackup()
     
     ThisWorkbook.SaveCopyAs backupPath & "\±¸·Ý_" & ThisWorkbook.Name
     
-    Set fso = vab.CreateObject("Scripting.FileSystemObject")
+    Set fso = VBA.CreateObject("Scripting.FileSystemObject")
     
-    Call fso.CopyFile(tipsBasePath, backupPath & "\" & ThisWorkbook.Name & "_tips_backup.json", True)
+    Call fso.CopyFile(tipsPath, backupPath & "\" & ThisWorkbook.Name & "_tips_backup.json", True)
 
 End Sub
 

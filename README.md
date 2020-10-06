@@ -98,65 +98,64 @@ HDT段的表先改为不保护的状态(未完成)
 
 
 ### 文件结构
-```js
+```json
 {
-    回潮: {
+    "回潮": {
 
-        第一批: [Node, ...],
+        "第一批": [Node, ...],
 
-        开始前: [Node, ...],
+        "开始前": [Node, ...],
 
-        开始后: [Node, ...],
+        "开始后": [Node, ...],
 
-        结束后: [Node, ...]
+        "结束后": [Node, ...]
+    },
+
+    "加料": {
+
+        "第一批": [Node, ...],
+
+        "开始前": [Node, ...],
+
+        "开始后": [Node, ...],
+
+        "结束后": [Node, ...]
 
     },
 
-    加料: {
+    "切烘加香": {
 
-        第一批: [Node, ...]
+        "第一批": [Node, ...],
 
-        开始前: [Node, ...],
+        "开始前": [Node, ...],
 
-        开始后: [Node, ...],
+        "开始后": [Node, ...],
 
-        结束后: [Node, ...]
-
-    },
-
-    切烘: {
-
-        第一批: [Node, ...]
-
-        开始前: [Node, ...],
-
-        开始后: [Node, ...],
-
-        结束后: [Node, ...]
+        "结束后": [Node, ...]
 
     },
 
-    贮叶柜: {
+    "贮叶柜": {
 
-        叶柜:  [Node, ...],
+        "叶柜":  [Node, ...],
 
-        HDT:  [Node, ...]
+        "HDT":  [Node, ...]
 
     },
 
-    贮丝柜: {
+    "贮丝柜": {
 
-        南区AF:  [Node, ...],
+        "南区AF":  [Node, ...],
 
-        南区GM:  [Node, ...],
+        "南区GM":  [Node, ...],
 
-        南区NT:  [Node, ...],
+        "南区NT":  [Node, ...],
 
-        木箱AC:  [Node, ...],
+        "木箱AC":  [Node, ...],
 
-        北区AD:  [Node, ...],
+        "北区AD":  [Node, ...],
 
-        北区EH:  [Node, ...]
+        "北区EH":  [Node, ...]
 
     }
 }
@@ -164,20 +163,20 @@ HDT段的表先改为不保护的状态(未完成)
 
 
 ### Node的结构
-```js
+```json
 {
 
-    sOffsetTime*: int,
+    "sOffsetTime": int,
 
-    aOffsetTime*: int,
+    "OffsetTime": int,
 
-    isForceBroadcast: boolen,
+    "isForceBroadcast": boolen,
 
-    redirect*: string, 
+    "redirect": string, 
 
-    hdt*: string
+    "hdt": string,
 
-    content*: string 
+    "content": string 
 
 }
 ```
