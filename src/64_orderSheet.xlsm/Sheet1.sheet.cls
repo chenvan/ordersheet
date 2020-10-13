@@ -1,4 +1,4 @@
-Private Sub Worksheet_Change(ByVal target As range)
+Private Sub Worksheet_Change(ByVal target As Range)
     Dim timeFormatColumns As Variant
     timeFormatColumns = Array(8, 9)
     
@@ -72,3 +72,4 @@ End Sub
 '    workbookOf96.Close False
 '    Application.ScreenUpdating = True
 'End Sub
+

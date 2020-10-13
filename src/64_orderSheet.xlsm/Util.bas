@@ -18,9 +18,9 @@ Function IsInArray(ByVal beFound As Variant, ByRef arr As Variant) As Boolean
 End Function
 
 Function isInSheetRange(ByVal target As Variant, ByVal shName As String, ByVal rangeName As String) As Boolean
-    Dim resultRng As range
+    Dim resultRng As Range
     
-    With Sheets(shName).range(rangeName)
+    With Sheets(shName).Range(rangeName)
         Set resultRng = .Find(What:=target)
         
         If resultRng Is Nothing Then
@@ -54,26 +54,26 @@ Sub clearContent()
     answer = MsgBox("此操作将会把所有内容清空，是否已经把文件另存", vbYesNoCancel, "警告")
     
     If answer = 6 Then
-        Sheets("回潮段").range("A3:A1171").ClearContents
-        Sheets("回潮段").range("C3:K1171").ClearContents
-        Sheets("回潮段").range("M3:N1171").ClearContents
-        Sheets("回潮段").range("P3:P1171").ClearContents
+        Sheets("回潮段").Range("A3:A1171").ClearContents
+        Sheets("回潮段").Range("C3:K1171").ClearContents
+        Sheets("回潮段").Range("M3:N1171").ClearContents
+        Sheets("回潮段").Range("P3:P1171").ClearContents
         
-        Sheets("加料段").range("A3:A1321").ClearContents
-        Sheets("加料段").range("C3:D1321").ClearContents
-        Sheets("加料段").range("G3:K1321").ClearContents
-        Sheets("加料段").range("N3:P1321").ClearContents
-        Sheets("加料段").range("R3:R1321").ClearContents
+        Sheets("加料段").Range("A3:A1321").ClearContents
+        Sheets("加料段").Range("C3:D1321").ClearContents
+        Sheets("加料段").Range("G3:K1321").ClearContents
+        Sheets("加料段").Range("N3:P1321").ClearContents
+        Sheets("加料段").Range("R3:R1321").ClearContents
         
-        Sheets("切烘加香段").range("A3:A1251").ClearContents
-        Sheets("切烘加香段").range("C3:D1251").ClearContents
-        Sheets("切烘加香段").range("G3:J1251").ClearContents
-        Sheets("切烘加香段").range("L3:AC1251").ClearContents
-        Sheets("切烘加香段").range("AE3:AE1251").ClearContents
+        Sheets("切烘加香段").Range("A3:A1251").ClearContents
+        Sheets("切烘加香段").Range("C3:D1251").ClearContents
+        Sheets("切烘加香段").Range("G3:J1251").ClearContents
+        Sheets("切烘加香段").Range("L3:AC1251").ClearContents
+        Sheets("切烘加香段").Range("AE3:AE1251").ClearContents
         
-        Sheets("HDT段").range("A3:A152").ClearContents
-        Sheets("HDT段").range("C3:D152").ClearContents
-        Sheets("HDT段").range("L3:L152").ClearContents
+        Sheets("HDT段").Range("A3:A152").ClearContents
+        Sheets("HDT段").Range("C3:D152").ClearContents
+        Sheets("HDT段").Range("L3:L152").ClearContents
         
     ElseIf answer = 7 Then
         varResult = Application.GetSaveAsFilename(filefilter:="Marco Enabled Workbook(*.xlsm), *xlsm")
@@ -213,10 +213,10 @@ Sub pushVoiceTip(ByVal content As String, ByVal tsOffset, ByVal baseTime As Vari
 End Sub
 
 Sub runFirstBatchTip(ByVal sheetName As String)
-    Dim found As range
+    Dim found As Range
     Dim firstTobaccoName As String
     'find today's first row
-    Set found = Sheets(sheetName).range("A:A").Find(Date)
+    Set found = Sheets(sheetName & "段").Range("A:A").Find(Date)
     
     If found Is Nothing Then
         Util.showMsg "没有找到今天的日期"
@@ -233,7 +233,7 @@ Public Function loadTips(ByVal fLayerP As String, ByVal sLayerP As String) As Va
     Dim fullPath As String
     Dim allTips As Scripting.Dictionary
     
-    fullPath = Sheets("设定").range("A:A").Find("语音文件路径").offset(0, 1).value
+    fullPath = Sheets("设定").Range("A:A").Find("语音文件路径").offset(0, 1).value
     
     Set allTips = loadJsonFile(fullPath)
     Set loadTips = allTips(fLayerP)(sLayerP)
@@ -260,8 +260,8 @@ Function getParam(ByVal tobaccoName As String, ByVal paramName As String) As Var
     
     Dim rowIndex, columnIndex As Integer
  
-    rowIndex = Sheets("设定").range("A2:A18").Find(tobaccoName).Row
-    columnIndex = Sheets("设定").range("A1:Z1").Find(paramName).Column
+    rowIndex = Sheets("设定").Range("A2:A18").Find(tobaccoName, lookat:=xlWhole).Row
+    columnIndex = Sheets("设定").Range("A1:Z1").Find(paramName, lookat:=xlWhole).Column
     
     getParam = Sheets("设定").Cells(rowIndex, columnIndex)
     
@@ -283,10 +283,14 @@ End Function
 Function adjustOffsetTime(ByVal tobaccoName As String, ByVal offsetTime As Integer) As Integer
     Dim mainTobaccoVolume As Integer
     
+
     mainTobaccoVolume = getParam(tobaccoName, "主叶丝秤流量")
     
-    adjustOffsetTime = offsetTime * 6250 / mainTobaccoVolume
+    
+    adjustOffsetTime = offsetTime + (9.375 - 0.0015 * mainTobaccoVolume)
+    
 End Function
+
 
 
 

@@ -1,6 +1,6 @@
 Option Explicit
 
-Private Sub Worksheet_Change(ByVal target As range)
+Private Sub Worksheet_Change(ByVal target As Range)
     Dim timeFormatColumns As Variant
     timeFormatColumns = Array(8, 9)
     
@@ -36,7 +36,7 @@ Private Sub Worksheet_Change(ByVal target As range)
             'Debug.Print dateOfSelectedRow
             
             '行的日期为今天或者是空内容时才进行提醒
-            If dateOfSelectedRow = Date Or IsEmpty(dateOfSelectedRow) Then
+            If dateOfSelectedRow = Date Or isEmpty(dateOfSelectedRow) Then
                 If storeName = "" Then
                     Util.speakAsync "补全入柜信息, 并重新填写烘丝开始时间"
                     Exit Sub
@@ -53,7 +53,7 @@ Private Sub Worksheet_Change(ByVal target As range)
            
             '结束时间
             '不再自动填写下一批的开始时间
-            Dim serialNum As range
+            Dim serialNum As Range
             Set serialNum = target.offset(0, -7)
             
             Dim addEssenceSweepDelay As Integer
@@ -72,7 +72,7 @@ Private Sub Worksheet_Change(ByVal target As range)
             dateOfSelectedRow = target.offset(0, 1 - target.Column).value
             
             '行的日期为今天或者是空内容时才进行提醒
-            If dateOfSelectedRow = Date Or IsEmpty(dateOfSelectedRow) Then
+            If dateOfSelectedRow = Date Or isEmpty(dateOfSelectedRow) Then
                 '第4批和第8批加香机需要清扫, 延时4分钟上烟
                 If serialNum.value = "4" Or serialNum.value = "8" Then
                     addEssenceSweepDelay = 4
@@ -92,4 +92,5 @@ End Sub
 Public Sub runFirstBatchTip()
    Util.runFirstBatchTip "切烘加香"
 End Sub
+
 

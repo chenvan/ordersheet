@@ -9,7 +9,7 @@ Private Sub Workbook_Open()
     'Util.loadDefaultTips
 End Sub
 
-Private Sub Workbook_SheetChange(ByVal Sh As Object, ByVal target As range)
+Private Sub Workbook_SheetChange(ByVal Sh As Object, ByVal target As Range)
     Dim sheetNames As Variant
     Dim settingSheetName As String
     
@@ -19,11 +19,11 @@ Private Sub Workbook_SheetChange(ByVal Sh As Object, ByVal target As range)
         
         If Util.IsInArray(Sh.Name, sheetNames) And target.Column = 4 And Util.IsNum(target.value) Then
             Dim tobaccoCode As String
-            tobaccoCode = tobacco.GetTobaccoCode(target.offset(0, -1).value, "设定")
+            tobaccoCode = Tobacco.GetTobaccoCode(target.offset(0, -1).value, "设定")
             
             If tobaccoCode <> "" Then
                 Dim segments() As String
-                segments = tobacco.ParseInputCode(target.value)
+                segments = Tobacco.ParseInputCode(target.value)
                 
                 If Not Util.IsInArray("", segments) Then
                     target.value = segments(0) & segments(1) & tobaccoCode & segments(2)
@@ -38,11 +38,12 @@ Private Sub Workbook_SheetChange(ByVal Sh As Object, ByVal target As range)
 End Sub
 
 
-Private Sub Workbook_SheetSelectionChange(ByVal Sh As Object, ByVal target As range)
+Private Sub Workbook_SheetSelectionChange(ByVal Sh As Object, ByVal target As Range)
     'hightlight selectd cell's row and  column, need to set rule first at home tab
     If Application.CutCopyMode = False Then
         Application.Calculate
     End If
     
 End Sub
+
 

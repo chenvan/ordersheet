@@ -1,4 +1,4 @@
-Private Sub Worksheet_Change(ByVal target As range)
+Private Sub Worksheet_Change(ByVal target As Range)
     Dim timeFormatColumns As Variant
     timeFormatColumns = Array(8, 9)
     
@@ -35,7 +35,7 @@ Private Sub Worksheet_Change(ByVal target As range)
             'Debug.Print "贮叶柜: " & storeName
             
             '行的日期为今天或者是空内容时才进行提醒
-            If dateOfSelectedRow = Date Or IsEmpty(dateOfSelectedRow) Then
+            If dateOfSelectedRow = Date Or isEmpty(dateOfSelectedRow) Then
                 
                 If storeName = "" Then
                     Util.speakAsync "补全储叶柜, 并重新填写加料开始时间"
@@ -72,7 +72,7 @@ Private Sub Worksheet_Change(ByVal target As range)
             dateOfSelectedRow = target.offset(0, 1 - target.Column).value
             
             '行的日期为今天或者是空内容时才进行提醒
-            If dateOfSelectedRow = Date Or IsEmpty(dateOfSelectedRow) Then
+            If dateOfSelectedRow = Date Or isEmpty(dateOfSelectedRow) Then
                 If currentTobacco <> nextTobacco Then
                     '下一批次为不同牌号需要洗加料管, 延时10分钟
                     feedLiquidSweepDelay = 10

@@ -31,11 +31,12 @@ Function GetTobaccoCode(ByVal tobaccoName As String, ByVal sheetNameWithCode As 
     tobaccoCode = ""
     
     If tobaccoName <> "" Then
-        Dim found As range
-        Set found = Sheets(sheetNameWithCode).range("A:A").Find(tobaccoName, , , xlWhole)
+        Dim found As Range
+        Set found = Sheets(sheetNameWithCode).Range("A:A").Find(tobaccoName, , , xlWhole)
         tobaccoCode = found.offset(0, 1).value
     End If
 
     GetTobaccoCode = tobaccoCode
 
 End Function
+

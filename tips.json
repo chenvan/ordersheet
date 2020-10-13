@@ -1,21 +1,106 @@
 {
 	"回潮": {
 		"第一批": [
-		
+			{
+				"sOffsetTime" : 15,
+				"isForceBroadcast": true,
+				"content" : "记得填写回潮开始时间"
+			},
+			{
+				"sOffsetTime" : 10,
+				"isForceBroadcast": true,
+				"content" : "暂存柜启动"
+			},
+			{
+				"sOffsetTime" : 1,
+				"isForceBroadcast": true,
+				"content" : "校正两台电脑时间"
+			},
+			{
+				"sOffsetTime" : 0,
+				"isForceBroadcast": true,
+				"content" : "确认报警和手自动状态"
+			},
+			{
+				"sOffsetTime" : 0,
+				"isForceBroadcast": true,
+				"content" : "进行回潮段检查"
+			}
 		],
 		"开始前": [
-		
+			{
+				"sOffsetTime" : 21,
+				"isForceBroadcast": true,
+				"content" : "填写回潮开始时间"
+			},
+			{
+				"sOffsetTime" : 20,
+				"isForceBroadcast": true,
+				"content" : "暂存柜启动"
+			},
+			{
+				"sOffsetTime" : 19,
+				"isForceBroadcast": true,
+				"content" : "转回潮工单"
+			}
 		],
 		"开始后": [
-		
+			{
+				"sOffsetTime" : 7,
+				"isForceBroadcast": true,
+				"content" : "暂存柜进叶"
+			},
+			{
+				"sOffsetTime" : 3,
+				"isForceBroadcast": true,
+				"content" : "查看回潮热风温度，加水流量"
+			}
 		],
 		"结束后": [
-		
+			{
+				"sOffsetTime" : 2,
+				"isForceBroadcast": true,
+				"content" : "切片回潮预填"
+			}
 		]
 	},
 	"加料": {
 		"第一批": [
-		
+			{
+				"sOffsetTime" : 21,
+				"isForceBroadcast": true,
+				"content" : "储叶柜启动"
+			},
+			{
+				"sOffsetTime" : 20,
+				"isForceBroadcast": true,
+				"content" : "记得填写加料开始时间"
+			},
+			{
+				"sOffsetTime" : 15,
+				"isForceBroadcast": true,
+				"content" : "确认加料机风机频率，加料比例"
+			},
+			{
+				"sOffsetTime" : 12,
+				"isForceBroadcast": true,
+				"content" : "检查加料罐温度"
+			},
+			{
+				"sOffsetTime" : 10,
+				"isForceBroadcast": true,
+				"content" : "确认加料水分仪通道号"
+			},
+			{
+				"sOffsetTime" : 0,
+				"isForceBroadcast": true,
+				"content" : "确认加料报警和手自动情况"
+			},
+			{
+				"sOffsetTime" : 0,
+				"isForceBroadcast": true,
+				"content" : "进行加料段检查"
+			}
 		],
 		"开始前": [
 			{
@@ -24,121 +109,330 @@
 				"redirect": "加料比例"
 			},
 			{
-				"sOffsetTime": 2,
+				"sOffsetTime" : 22,
 				"isForceBroadcast": true,
-				"content": "记得填写加料开始时间"
+				"content" : "储叶柜启动"
+			},
+			{
+				"sOffsetTime" : 21,
+				"isForceBroadcast": true,
+				"content" : "填写加料开始时间"
+			},
+			{
+				"sOffsetTime" : 18,
+				"isForceBroadcast": true,
+				"content" : "确认加料机风机频率，加料比例"
+			},
+			{
+				"sOffsetTime" : 18,
+				"isForceBroadcast": true,
+				"content" : "检查加料罐温度"
+			},
+			{
+				"sOffsetTime" : 17,
+				"isForceBroadcast": true,
+				"content" : "确认加料水分仪通道号"
 			}
 		],
 		"开始后": [
 			{
-				"sOffsetTime": 1,
-				"isForceBroadcast": false,
-				"content": "开始后"
+				"sOffsetTime" : 8,
+				"isForceBroadcast": true,
+				"content" : "查看加料出口温度，水分"
 			}
 		],
 		"结束后": [
 			{
-				"sOffsetTime": 1,
-				"isForceBroadcast": false,
-				"content": "结束后"
+				"sOffsetTime" : 2,
+				"isForceBroadcast": true,
+				"content" : "查看加料比例变异系数"
 			}
 		]
 	},
 	"切烘加香": {
 		"第一批": [
-		
-		],
-		"开始前": [
+			{
+				"sOffsetTime" : 18,
+				"isForceBroadcast": true,
+				"content" : "记得填写烘丝开始时间"
+			},
+			{
+				"sOffsetTime" : 15,
+				"isForceBroadcast": true,
+				"hdt" : "HDT秤预填完成"
+			},
+			{
+				"sOffsetTime" : 12,
+				"isForceBroadcast": true,
+				"hdt" : "镜头二零一查看HDT出料"
+			},
+			{
+				"sOffsetTime" : 11,
+				"isForceBroadcast": true,
+				"hdt" : "确认HDT水分仪通道号"
+			},
+			{
+				"sOffsetTime" : 10,
+				"isForceBroadcast": true,
+				"hdt" : "转HDT工单"
+			},
+			{
+				"sOffsetTime" : 8,
+				"isForceBroadcast": true,
+				"content" : "入柜状态为待料，防止撞线"
+			},
+			{
+				"sOffsetTime" : 7,
+				"isForceBroadcast": true,
+				"content" : "确认烘丝水分仪通道号"
+			},
+			{
+				"sOffsetTime" : 6,
+				"isForceBroadcast": true,
+				"content" : "校正两台电脑时间"
+			},
+			{
+				"sOffsetTime": 5,
+				"isForceBroadcast": true,
+				"content" : "确认叶柜底带，切丝定量带频率"
+			},
+			{
+				"sOffsetTime": 3,
+				"isForceBroadcast": true,
+				"content" : "检查加香机参数"
+			},
+			{
+				"sOffsetTime": 2,
+				"isForceBroadcast": true,
+				"content" : "检查各电子秤状态，确认累计量清零"
+			},
 			{
 				"sOffsetTime": 1,
 				"isForceBroadcast": true,
-				"redirect": "主叶丝秤流量"
+				"content": "确认各段报警和手自动情况"
+			},
+			{
+				"sOffsetTime": 0,
+				"isForceBroadcast": true,
+				"content": "确认所有工单产量正确"
+			},
+			{
+				"sOffsetTime": 0,
+				"isForceBroadcast": true,
+				"content": "进行切烘段检查"
+			}
+		],
+		"开始前": [
+			{
+				"sOffsetTime" : 26,
+				"isForceBroadcast": true,
+				"content" : "记得填写烘丝开始时间"
+			},
+			{
+				"sOffsetTime" : 22,
+				"isForceBroadcast": true,
+				"content" : "六四烘丝上烟，填写开始时间"
+			},
+			{
+				"sOffsetTime" : 21,
+				"isForceBroadcast": true,
+				"content" : "入柜状态为待料，防止撞线"
+			},
+			{
+				"sOffsetTime" : 20,
+				"isForceBroadcast": true,
+				"content" : "确认烘丝水分仪通道号"
+			},
+			{
+				"sOffsetTime" : 6,
+				"isForceBroadcast": true,
+				"content" : "转切丝工单，检查出柜状态"
+			},
+			{
+				"sOffsetTime" : 19,
+				"isForceBroadcast": true,
+				"hdt" : "确认HDT水分仪通道号"
+			},
+			{
+				"sOffsetTime" : 18,
+				"isForceBroadcast": true,
+				"hdt" : "HDT秤预填完成"
+			},
+			{
+				"sOffsetTime" : 17,
+				"isForceBroadcast": true,
+				"hdt" : "镜头二零一查看HDT出料"
+			},
+			{
+				"sOffsetTime" : 15,
+				"isForceBroadcast": true,
+				"hdt" : "转HDT工单"
 			}
 		],
 		"开始后": [
 			{
-				"sOffsetTime": 1,
+				"aOffsetTime" : 25,
 				"isForceBroadcast": true,
-				"hdt": "HDT出柜"
+				"content" : "留意加香机出口水分"
 			},
 			{
-				"aOffsetTime": 2,
+				"aOffsetTime" : 19,
 				"isForceBroadcast": true,
-				"content": "主叶丝秤上烟"
+				"content" : "开始加香"
+			},
+			{
+				"aOffsetTime" : 17,
+				"isForceBroadcast": true,
+				"content" : "主叶丝秤上烟"
+			},
+			{
+				"sOffsetTime" : 11,
+				"isForceBroadcast": true,
+				"content" : "梗丝秤，膨丝秤填充完成"
+			},
+			{
+				"sOffsetTime" : 11,
+				"isForceBroadcast": true,
+				"content" : "提醒加香机开机"
+			},
+			{
+				"sOffsetTime" : 10,
+				"isForceBroadcast": true,
+				"content" : "烟到风选"
+			},
+			{
+				"sOffsetTime" : 7,
+				"isForceBroadcast": true,
+				"content" : "查看烘丝出口水分，筒温"
+			},
+			{
+				"sOffsetTime" : 2,
+				"isForceBroadcast": true,
+				"content" : "烘丝出口振槽翻板门关闭"
+			},
+			{
+				"sOffsetTime" : 8,
+				"isForceBroadcast": true,
+				"redirect" : "主叶丝秤流量"
 			}
 		],
 		"结束后": [
 			{
-				"aOffsetTime": 1,
+				"sOffsetTime" : 21,
 				"isForceBroadcast": true,
-				"content": "变异系数"
+				"content" : "查看三丝秤变异系数，加香比例变异系数"
+			},
+			{
+				"sOffsetTime" : 16,
+				"isForceBroadcast": true,
+				"content" : "留意膨丝秤，梗丝秤尾料"
+			},
+			{
+				"sOffsetTime" : 14,
+				"isForceBroadcast": true,
+				"hdt" : "结束HDT工单"
+			},
+			{
+				"sOffsetTime" : 8,
+				"isForceBroadcast": true,
+				"hdt" : "留意HDT秤尾料"
+			},
+			{
+				"sOffsetTime" : 2,
+				"isForceBroadcast": true,
+				"content" : "有回掺需通知膨丝中控"
 			}
 		]
 	},
 	"贮叶柜": {
 		"叶柜": [
 			{
-				"sOffsetTime": 1,
+				"sOffsetTime" : 5,
 				"isForceBroadcast": true,
-				"content": "叶柜"
+				"content" : "烟进储叶柜"
 			}
 		],
 		"HDT": [
 			{
-				"sOffsetTime": 1,
+				"sOffsetTime" : 15,
 				"isForceBroadcast": true,
-				"content": "HDT柜"
+				"content" : "烟进HDT柜"
 			}
 		]
 	},
 	"贮丝柜": {
 		"南AF": [
 			{
-				"aOffsetTime": 1,
+				"aOffsetTime" : 23,
 				"isForceBroadcast": true,
-				"content": "南AF"
+				"content" : "烟到南AF"
 			}
 		],
 		"南GM": [
 			{
-				"aOffsetTime": 1,
+				"aOffsetTime" : 15,
 				"isForceBroadcast": true,
-				"content": "南GM"
+				"content" : "烟到南GM"
 			}
 		],
 		"南NT": [
 			{
-				"aOffsetTime": 1,
+				"aOffsetTime" : 23,
 				"isForceBroadcast": true,
-				"content": "南NT"
+				"content" : "烟到南NT"
 			}
 		],
 		"木AC": [
 			{
-				"aOffsetTime": 1,
+				"aOffsetTime" : 20,
 				"isForceBroadcast": true,
-				"content": "木AC"
+				"content" : "烟到一一三镜头"
+			},
+			{
+				"aOffsetTime" : 23,
+				"isForceBroadcast": true,
+				"content" : "烟到木箱AC"
 			}
 		],
 		"北AD": [
 			{
-				"aOffsetTime": 1,
+				"aOffsetTime" : 20,
 				"isForceBroadcast": true,
-				"content": "北AD"
+				"content" : "烟到一一三镜头"
+			},
+			{
+				"aOffsetTime" : 26,
+				"isForceBroadcast": true,
+				"content" : "烟到115镜头"
+			},
+			{
+				"aOffsetTime" : 30,
+				"isForceBroadcast": true,
+				"content" : "烟到北区AD"
 			}
 		],
 		"北EH": [
 			{
-				"aOffsetTime": 1,
+				"aOffsetTime" : 20,
 				"isForceBroadcast": true,
-				"content": "北EH"
+				"content" : "烟到一一三镜头"
+			},
+			{
+				"aOffsetTime" : 25,
+				"isForceBroadcast": true,
+				"content" : "烟到115镜头"
+			},
+			{
+				"aOffsetTime" : 30,
+				"isForceBroadcast": true,
+				"content" : "烟到北区EH"
 			}
 		],
 		"外AB": [
 			{
-				"aOffsetTime": 1,
+				"aOffsetTime" : 15,
 				"isForceBroadcast": true,
-				"content": "外AB"
+				"content" : "烟到外运柜"
 			}
 		]
 	}
