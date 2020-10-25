@@ -13,11 +13,11 @@ Private Sub Workbook_SheetChange(ByVal Sh As Object, ByVal target As Range)
     Dim sheetNames As Variant
     Dim settingSheetName As String
     
-    sheetNames = Array("«–∫Êº”œ„∂Œ", "ªÿ≥±∂Œ", "º”¡œ∂Œ", "HDT∂Œ")
+    sheetNames = Array("«–∫Êº”œ„∂Œ", "ªÿ≥±∂Œ", "º”¡œ∂Œ")
     
     If Not IsArray(target.value) Then
         
-        If Util.IsInArray(Sh.Name, sheetNames) And target.Column = 4 And Util.IsNum(target.value) Then
+        If ((Util.IsInArray(Sh.Name, sheetNames) And target.Column = 4) Or (target.Column = 3 And Sh.Name = "HDT∂Œ")) And Util.IsNum(target.value) Then
             Dim tobaccoCode As String
             tobaccoCode = Tobacco.GetTobaccoCode(target.offset(0, -1).value, "…Ë∂®")
             

@@ -11,6 +11,8 @@
 
 手动打开vbaDeveloper.xlam, 就会出现加载项, 然后导出
 
+excel文件名是中文就无法导出
+
 
 
 ##  VBA-JSON的使用
@@ -171,10 +173,10 @@ HDT段的表先改为不保护的状态(未完成)
     "OffsetTime": int,
 
     "isForceBroadcast": boolen,
+    
+    "filter": array,
 
     "redirect": string, 
-
-    "hdt": string,
 
     "content": string 
 
@@ -189,13 +191,13 @@ sOffsetTime是固定的偏移时间
 
 aOffsetTime则需要经过主叶丝秤流量进行变换(输送带的速度没有改变, 主要是填满主叶丝暂存柜需要的时间不同)
 
-redirect, hdt与content三者只会有一
+filter是content或redirect只应用于filter内的牌号,如果没有filter这一项, 则所有牌号都使用
 
-存在redirect. 用redirect, 牌号找到需要的参数, 用参数生成新的内容
+redirect, 与content二者只会有一
 
-存在hdtContent. 用牌号检查是否需要回掺HDT, 需要回掺则使用hdtContent
+​	存在redirect. 用redirect, 牌号找到需要的参数, 用参数生成新的内容
 
-存在content. 直接使用
+​	存在content. 直接使用
 
 
 
@@ -211,7 +213,7 @@ JSON 文件的编码需要是 ANSI, 否则中文会变为乱码且无法正确�
 
 主叶丝秤之后的语音偏移时间才需要改变
 
-adjustOffsetTime = offsetTime * 6250 / 主叶丝秤流量 
+// adjustOffsetTime = offsetTime * 6250 / 主叶丝秤流量 
 
 
 
@@ -225,6 +227,33 @@ adjustOffsetTime = offsetTime * 6250 / 主叶丝秤流量
 
 
 
+## 高亮选中行和列
+
+### 序号为第5, 9, 则为true
+
+#### 列
+
+AND(CELL("col") = COLUMN(), OR(INDIRECT(ADDRESS(CELL("row"), 2)) = 5, INDIRECT(ADDRESS(CELL("row"), 2)) = 9))
+
+#### 行
+
+AND(CELL("row") = ROW(), OR($B2 = 5, $B2 = 9))
+
+### 序号不是第5, 9, 则为true
+
+#### 列
+
+AND(CELL("col")=COLUMN(), AND(INDIRECT(ADDRESS(CELL("row"), 2)) <> 5, INDIRECT(ADDRESS(CELL("row"), 2)) <> 9))
+
+#### 行
+
+AND(CELL("row")=ROW(), $B2 <> 5, $B2 <> 9)
 
 
+
+##　NEXT
+
+3. offset时间精确到秒
+2. 水分汇总用vba代码
+3. 语音逻辑增加filter功能
 

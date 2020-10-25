@@ -276,12 +276,12 @@
 				"content" : "留意加香机出口水分"
 			},
 			{
-				"aOffsetTime" : 19,
+				"aOffsetTime" : 18,
 				"isForceBroadcast": true,
 				"content" : "开始加香"
 			},
 			{
-				"aOffsetTime" : 17,
+				"aOffsetTime" : 16,
 				"isForceBroadcast": true,
 				"content" : "主叶丝秤上烟"
 			},
@@ -299,6 +299,11 @@
 				"sOffsetTime" : 10,
 				"isForceBroadcast": true,
 				"content" : "烟到风选"
+			},
+			{
+				"sOffsetTime" : 7,
+				"isForceBroadcast": true,
+				"hdt" : "hdt秤启动"
 			},
 			{
 				"sOffsetTime" : 7,

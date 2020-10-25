@@ -2,15 +2,15 @@ Option Explicit
 
 Private Sub Worksheet_Change(ByVal target As Range)
     Dim timeFormatColumns As Variant
-    timeFormatColumns = Array(8, 9)
+    timeFormatColumns = Array(7, 8)
     
     If Not IsArray(target.value) Then
     
         Dim currentTobacco, nextTobacco As String
         Dim dateOfSelectedRow As Variant
         Dim beginTimeColumn, endTimeColumn As Integer
-        beginTimeColumn = 8
-        endTimeColumn = 9
+        beginTimeColumn = 7
+        endTimeColumn = 8
         
         If Util.IsInArray(target.Column, timeFormatColumns) And Util.IsNum(target.value) Then
             'inputTime's column is time format, which is a double type
@@ -36,7 +36,7 @@ Private Sub Worksheet_Change(ByVal target As Range)
             'Debug.Print dateOfSelectedRow
             
             '行的日期为今天或者是空内容时才进行提醒
-            If dateOfSelectedRow = Date Or isEmpty(dateOfSelectedRow) Then
+            If dateOfSelectedRow = Date Or IsEmpty(dateOfSelectedRow) Then
                 If storeName = "" Then
                     Util.speakAsync "补全入柜信息, 并重新填写烘丝开始时间"
                     Exit Sub
@@ -72,7 +72,7 @@ Private Sub Worksheet_Change(ByVal target As Range)
             dateOfSelectedRow = target.offset(0, 1 - target.Column).value
             
             '行的日期为今天或者是空内容时才进行提醒
-            If dateOfSelectedRow = Date Or isEmpty(dateOfSelectedRow) Then
+            If dateOfSelectedRow = Date Or IsEmpty(dateOfSelectedRow) Then
                 '第4批和第8批加香机需要清扫, 延时4分钟上烟
                 If serialNum.value = "4" Or serialNum.value = "8" Then
                     addEssenceSweepDelay = 4
@@ -91,6 +91,66 @@ End Sub
 
 Public Sub runFirstBatchTip()
    Util.runFirstBatchTip "切烘加香"
+End Sub
+
+Public Sub calcuRatio()
+    Dim lastRow As Long
+    Dim tobaccoName As String
+    Dim Pt, Gt, Ct, CSettingRatio, CDiff, realRatio As Double
+    Dim endTimeColumn, tobaccoNameColumn As Integer
+    
+    endTimeColumn = 8
+    tobaccoNameColumn = 3
+    
+    lastRow = Cells(Rows.Count, endTimeColumn).End(xlUp).Row + 1
+    tobaccoName = Cells(lastRow, tobaccoNameColumn)
+    
+    Ct = Application.InputBox("回掺残丝量: ", Title:=tobaccoName, Type:=1)
+    
+    If Ct Then
+    
+        Pt = Util.getParam(tobaccoName, "膨丝回掺量")
+        Gt = Util.getParam(tobaccoName, "梗丝回掺量")
+        CSettingRatio = Util.getParam(tobaccoName, "残丝回掺比例")
+        CDiff = Util.getParam(tobaccoName, "残丝批间差异系数")
+        
+        realRatio = (Ct + Ct * CSettingRatio * CDiff) * 100 / (10000 - Pt - Gt)
+        
+        MsgBox "最大回掺比例: " & CSettingRatio & vbNewLine & "计算回掺比例: " & Format(realRatio, "0.000"), , tobaccoName
+    End If
+End Sub
+
+Public Sub calcuSettingTemp()
+    '找出选中行的入口水分, 出口水分, 实际温度, 烟牌名
+    Dim currentRow As Long
+    Dim tobaccoName As String
+    Dim inputWaterContent, outputWaterContent, realTemp, vol, sxWaterAdd, stdWaterRemove, ck1 As Double
+    Dim dryWeight, inputWeight, outputWeight, realWaterRemove, settingTemp As Double
+    
+    currentRow = ActiveCell.Row
+    
+    tobaccoName = Cells(currentRow, 3)
+    inputWaterContent = Cells(currentRow, 14)
+    outputWaterContent = Cells(currentRow, 12)
+    realTemp = Cells(currentRow, 15)
+    
+    If IsEmpty(inputWaterContent) Or IsEmpty(outputWaterContent) Or IsEmpty(tobaccoName) Or IsEmpty(realTemp) Then
+        Exit Sub
+    End If
+    
+    vol = Util.getParam(tobaccoName, "烘丝秤流量")
+    sxWaterAdd = Util.getParam(tobaccoName, "SX水分增加")
+    stdWaterRemove = Util.getParam(tobaccoName, "标准除水量")
+    ck1 = Util.getParam(tobaccoName, "ck1")
+    
+    dryWeight = vol * (1 - inputWaterContent * 0.01)
+    inputWeight = dryWeight / (1 - (inputWaterContent + sxWaterAdd) * 0.01)
+    outputWeight = dryWeight / (1 - outputWaterContent * 0.01)
+    realWaterRemove = inputWeight - outputWeight
+    
+    settingTemp = (stdWaterRemove - realWaterRemove) * ck1 + realTemp
+    
+    MsgBox "设定温度: " & Format(settingTemp, "000.0"), , tobaccoName
 End Sub
 
 

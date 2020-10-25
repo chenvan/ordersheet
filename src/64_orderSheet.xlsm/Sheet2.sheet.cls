@@ -1,14 +1,14 @@
 Private Sub Worksheet_Change(ByVal target As Range)
     Dim timeFormatColumns As Variant
-    timeFormatColumns = Array(7, 8)
+    timeFormatColumns = Array(6, 7)
     
     If Not IsArray(target.value) Then
         Dim beginTimeColumn, endTimeColumn As Integer
         Dim currentTobacco, nextTobacco As String
         Dim dateOfSelectedRow As Variant
         
-        beginTimeColumn = 7
-        endTimeColumn = 8
+        beginTimeColumn = 6
+        endTimeColumn = 7
         
         If Util.IsInArray(target.Column, timeFormatColumns) And Util.IsNum(target.value) Then
             'inputTime's column is time format, which is a double type
@@ -29,7 +29,7 @@ Private Sub Worksheet_Change(ByVal target As Range)
             dateOfSelectedRow = target.offset(0, 1 - target.Column).value
    
             '行的日期为今天或者是空内容时才进行提醒
-            If dateOfSelectedRow = Date Or isEmpty(dateOfSelectedRow) Then
+            If dateOfSelectedRow = Date Or IsEmpty(dateOfSelectedRow) Then
                 Util.sheduleVoiceTips "回潮", currentTobacco, "开始后", target.value, 0
             Else
                 Util.showMsg "日期并非今天, 回潮开始时间不会触发语音提醒"
@@ -55,7 +55,7 @@ Private Sub Worksheet_Change(ByVal target As Range)
             dateOfSelectedRow = target.offset(0, 1 - target.Column).value
             
             '行的日期为今天或者是空内容时才进行提醒
-            If dateOfSelectedRow = Date Or isEmpty(dateOfSelectedRow) Then
+            If dateOfSelectedRow = Date Or IsEmpty(dateOfSelectedRow) Then
                 '批结束提醒
                 Util.sheduleVoiceTips "回潮", currentTobacco, "结束后", target.value, 0
                 '下一批开始前提醒

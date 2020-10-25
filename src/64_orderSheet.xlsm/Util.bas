@@ -283,12 +283,11 @@ End Function
 Function adjustOffsetTime(ByVal tobaccoName As String, ByVal offsetTime As Integer) As Integer
     Dim mainTobaccoVolume As Integer
     
-
     mainTobaccoVolume = getParam(tobaccoName, "Ö÷Ò¶Ë¿³ÓÁ÷Á¿")
     
+    'adjustOffsetTime = offsetTime * (6250 / mainTobaccoVolume)
     
     adjustOffsetTime = offsetTime + (9.375 - 0.0015 * mainTobaccoVolume)
-    
 End Function
 
 

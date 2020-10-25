@@ -5,7 +5,7 @@ Sub AutoBackup()
     Dim fso As Object
     Dim backupPath, tipsPath As String
     
-    backupPath = "C:\备份"
+    backupPath = "G:\备份"
     tipsPath = Sheets("设定").Range("A:A").Find("语音文件路径").offset(0, 1).value
     
     If Dir(backupPath, vbDirectory) = vbNullString Then
