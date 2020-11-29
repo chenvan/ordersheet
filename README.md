@@ -11,7 +11,7 @@
 
 手动打开vbaDeveloper.xlam, 就会出现加载项, 然后导出
 
-excel文件名是中文就无法导出
+**excel文件名是中文就无法导出**
 
 
 
@@ -176,7 +176,7 @@ HDT段的表先改为不保护的状态(未完成)
     
     "filter": array,
 
-    "redirect": string, 
+    "redirectList": array, 
 
     "content": string 
 
@@ -191,11 +191,11 @@ sOffsetTime是固定的偏移时间
 
 aOffsetTime则需要经过主叶丝秤流量进行变换(输送带的速度没有改变, 主要是填满主叶丝暂存柜需要的时间不同)
 
-filter是content或redirect只应用于filter内的牌号,如果没有filter这一项, 则所有牌号都使用
+filter是content或redirectList只应用于filter内的牌号,如果没有filter这一项, 则所有牌号都使用
 
-redirect, 与content二者只会有一
+redirectList, 与content二者只会有一
 
-​	存在redirect. 用redirect, 牌号找到需要的参数, 用参数生成新的内容
+​	存在redirectList. 用redirectList, 牌号找到需要的参数, 用参数生成新的内容
 
 ​	存在content. 直接使用
 
@@ -212,8 +212,6 @@ JSON 文件的编码需要是 ANSI, 否则中文会变为乱码且无法正确�
 ***使用双喜(经典)的偏移时间作为基准***
 
 主叶丝秤之后的语音偏移时间才需要改变
-
-// adjustOffsetTime = offsetTime * 6250 / 主叶丝秤流量 
 
 
 
@@ -251,9 +249,26 @@ AND(CELL("row")=ROW(), $B2 <> 5, $B2 <> 9)
 
 
 
-##　NEXT
+## 解决其他表插入列后会令水分汇总表数据错乱的问题
 
-3. offset时间精确到秒
-2. 水分汇总用vba代码
-3. 语音逻辑增加filter功能
+vlookup写对了可以自动应对插入列的问题
+
+首先第二个参数"寻找的范围"可以自动更新
+
+第三个参数使用 colum(表名!列1) - colum(表名!列2) + 1 也能进行自动更新
+
+
+
+
+
+## NEXT
+
+1. offset时间精确到秒
+2. ~~水分汇总用vba代码（查看解决其他表插入列后会令水分汇总表数据错乱的问题)~~
+3. ~~语音逻辑增加filter功能~~
+4. ~~状态栏文字提醒加上时间~~
+5. ~~修改cleanContent函数, 把文字颜色也清除掉~~
+6. 取消提醒(?)
+7. 提醒的过期逻辑
+8. ~~切烘加香表加一栏加料出口水分~~
 

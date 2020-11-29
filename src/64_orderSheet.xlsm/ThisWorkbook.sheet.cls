@@ -2,11 +2,9 @@ Option Explicit
 
 Private Sub Workbook_Open()
     '自动备份
-    
     Application.OnTime TimeValue("12:10:00"), "AutoBackup.AutoBackup"
     Application.OnTime TimeValue("22:10:00"), "AutoBackup.AutoBackup"
     
-    'Util.loadDefaultTips
 End Sub
 
 Private Sub Workbook_SheetChange(ByVal Sh As Object, ByVal target As Range)

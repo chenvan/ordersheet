@@ -12,6 +12,16 @@
 				"content" : "暂存柜启动"
 			},
 			{
+				"sOffsetTime" : 3,
+				"isForceBroadcast": true,
+				"content" : "确认回潮机水分仪通道号"
+			},
+			{
+				"sOffsetTime" : 2,
+				"isForceBroadcast": true,
+				"content" : "确认所有工单产量正确"
+			},
+			{
 				"sOffsetTime" : 1,
 				"isForceBroadcast": true,
 				"content" : "校正两台电脑时间"
@@ -46,7 +56,7 @@
 		],
 		"开始后": [
 			{
-				"sOffsetTime" : 7,
+				"sOffsetTime" : 5,
 				"isForceBroadcast": true,
 				"content" : "暂存柜进叶"
 			},
@@ -104,12 +114,7 @@
 		],
 		"开始前": [
 			{
-				"sOffsetTime": 1,
-				"isForceBroadcast": true,
-				"redirect": "加料比例"
-			},
-			{
-				"sOffsetTime" : 22,
+				"sOffsetTime" : 21,
 				"isForceBroadcast": true,
 				"content" : "储叶柜启动"
 			},
@@ -132,6 +137,11 @@
 				"sOffsetTime" : 17,
 				"isForceBroadcast": true,
 				"content" : "确认加料水分仪通道号"
+			},
+			{
+				"sOffsetTime": 17,
+				"isForceBroadcast": true,
+				"redirectList": ["加料比例"]
 			}
 		],
 		"开始后": [
@@ -139,9 +149,19 @@
 				"sOffsetTime" : 8,
 				"isForceBroadcast": true,
 				"content" : "查看加料出口温度，水分"
+			},
+			{
+				"sOffsetTime" : 10,
+				"isForceBroadcast": true,
+				"content" : "查看热风回风温度PID开度"
 			}
 		],
 		"结束后": [
+			{
+				"sOffsetTime" : 3,
+				"isForceBroadcast": true,
+				"content" : "检查电子秤流量曲线"
+			},
 			{
 				"sOffsetTime" : 2,
 				"isForceBroadcast": true,
@@ -159,22 +179,26 @@
 			{
 				"sOffsetTime" : 15,
 				"isForceBroadcast": true,
-				"hdt" : "HDT秤预填完成"
+				"filter": ["双喜（经典）"],
+				"content" : "HDT秤预填完成"
 			},
 			{
 				"sOffsetTime" : 12,
 				"isForceBroadcast": true,
-				"hdt" : "镜头二零一查看HDT出料"
+				"filter": ["双喜（经典）"],
+				"content" : "镜头二零一查看HDT出料"
 			},
 			{
 				"sOffsetTime" : 11,
 				"isForceBroadcast": true,
-				"hdt" : "确认HDT水分仪通道号"
+				"filter": ["双喜（经典）"],
+				"content" : "确认HDT水分仪通道号"
 			},
 			{
 				"sOffsetTime" : 10,
 				"isForceBroadcast": true,
-				"hdt" : "转HDT工单"
+				"filter": ["双喜（经典）"],
+				"content" : "转HDT工单"
 			},
 			{
 				"sOffsetTime" : 8,
@@ -251,22 +275,26 @@
 			{
 				"sOffsetTime" : 19,
 				"isForceBroadcast": true,
-				"hdt" : "确认HDT水分仪通道号"
+				"filter": ["双喜（经典）"],
+				"content" : "确认HDT水分仪通道号"
 			},
 			{
 				"sOffsetTime" : 18,
 				"isForceBroadcast": true,
-				"hdt" : "HDT秤预填完成"
+				"filter": ["双喜（经典）"],
+				"content" : "HDT秤预填完成"
 			},
 			{
 				"sOffsetTime" : 17,
 				"isForceBroadcast": true,
-				"hdt" : "镜头二零一查看HDT出料"
+				"filter": ["双喜（经典）"],
+				"content" : "镜头二零一查看HDT出料"
 			},
 			{
 				"sOffsetTime" : 15,
 				"isForceBroadcast": true,
-				"hdt" : "转HDT工单"
+				"filter": ["双喜（经典）"],
+				"content" : "转HDT工单"
 			}
 		],
 		"开始后": [
@@ -301,9 +329,10 @@
 				"content" : "烟到风选"
 			},
 			{
-				"sOffsetTime" : 7,
+				"sOffsetTime" : 8,
 				"isForceBroadcast": true,
-				"hdt" : "hdt秤启动"
+				"filter": ["双喜（经典）"],
+				"content" : "hdt秤启动, 查看一九八镜头"
 			},
 			{
 				"sOffsetTime" : 7,
@@ -318,7 +347,7 @@
 			{
 				"sOffsetTime" : 8,
 				"isForceBroadcast": true,
-				"redirect" : "主叶丝秤流量"
+				"redirectList" : ["主叶丝秤流量", "膨丝回掺量"]
 			}
 		],
 		"结束后": [
@@ -335,12 +364,14 @@
 			{
 				"sOffsetTime" : 14,
 				"isForceBroadcast": true,
-				"hdt" : "结束HDT工单"
+				"filter": ["双喜（经典）"],
+				"content" : "结束HDT工单"
 			},
 			{
 				"sOffsetTime" : 8,
 				"isForceBroadcast": true,
-				"hdt" : "留意HDT秤尾料"
+				"filter": ["双喜（经典）"],
+				"content" : "留意HDT秤尾料"
 			},
 			{
 				"sOffsetTime" : 2,
@@ -352,7 +383,7 @@
 	"贮叶柜": {
 		"叶柜": [
 			{
-				"sOffsetTime" : 5,
+				"sOffsetTime" : 4,
 				"isForceBroadcast": true,
 				"content" : "烟进储叶柜"
 			}

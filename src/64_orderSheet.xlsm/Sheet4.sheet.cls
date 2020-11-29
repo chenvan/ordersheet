@@ -31,7 +31,7 @@ Private Sub Worksheet_Change(ByVal target As Range)
             
             currentTobacco = target.offset(0, 3 - target.Column).value
             dateOfSelectedRow = target.offset(0, 1 - target.Column).value
-            storeName = target.offset(0, 7 - target.Column).value
+            storeName = target.offset(0, 6 - target.Column).value
             'Debug.Print (currentTobacco)
             'Debug.Print dateOfSelectedRow
             

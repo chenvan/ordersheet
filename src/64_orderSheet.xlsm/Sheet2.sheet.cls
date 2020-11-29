@@ -1,3 +1,5 @@
+Option Explicit
+
 Private Sub Worksheet_Change(ByVal target As Range)
     Dim timeFormatColumns As Variant
     timeFormatColumns = Array(6, 7)

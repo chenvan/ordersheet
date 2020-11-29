@@ -17,6 +17,20 @@ Function IsInArray(ByVal beFound As Variant, ByRef arr As Variant) As Boolean
     
 End Function
 
+Function IsInCollection(ByVal beFound As Variant, ByRef coll As Variant) As Boolean
+    Dim item As Variant
+    
+    For Each item In coll
+        If item = beFound Then
+            IsInCollection = True
+            Exit Function
+        End If
+    Next
+    
+    IsInCollection = False
+    
+End Function
+
 Function isInSheetRange(ByVal target As Variant, ByVal shName As String, ByVal rangeName As String) As Boolean
     Dim resultRng As Range
     
@@ -55,26 +69,28 @@ Sub clearContent()
     
     If answer = 6 Then
         Sheets("回潮段").Range("A3:A1171").ClearContents
-        Sheets("回潮段").Range("C3:K1171").ClearContents
-        Sheets("回潮段").Range("M3:N1171").ClearContents
-        Sheets("回潮段").Range("P3:P1171").ClearContents
+        Sheets("回潮段").Range("C3:J1171").ClearContents
+        Sheets("回潮段").Range("L3:M1171").ClearContents
+        Sheets("回潮段").Range("O3:O1171").ClearContents
+        Sheets("回潮段").Range("O3:O1171").Font.Color = vbBlack
         
         Sheets("加料段").Range("A3:A1321").ClearContents
         Sheets("加料段").Range("C3:D1321").ClearContents
-        Sheets("加料段").Range("G3:K1321").ClearContents
-        Sheets("加料段").Range("N3:P1321").ClearContents
+        Sheets("加料段").Range("F3:J1321").ClearContents
+        Sheets("加料段").Range("M3:M1321").ClearContents
+        Sheets("加料段").Range("O3:P1321").ClearContents
         Sheets("加料段").Range("R3:R1321").ClearContents
+        Sheets("加料段").Range("R3:R1321").Font.Color = vbBlack
         
         Sheets("切烘加香段").Range("A3:A1251").ClearContents
         Sheets("切烘加香段").Range("C3:D1251").ClearContents
-        Sheets("切烘加香段").Range("G3:J1251").ClearContents
-        Sheets("切烘加香段").Range("L3:AC1251").ClearContents
-        Sheets("切烘加香段").Range("AE3:AE1251").ClearContents
+        Sheets("切烘加香段").Range("G3:Z1251").ClearContents
+        Sheets("切烘加香段").Range("AB3:AB1251").ClearContents
+        Sheets("切烘加香段").Range("K3:K1251").Font.Color = vbBlack
         
-        Sheets("HDT段").Range("A3:A152").ClearContents
-        Sheets("HDT段").Range("C3:D152").ClearContents
-        Sheets("HDT段").Range("L3:L152").ClearContents
         
+        Sheets("HDT段").Range("A3:E152").ClearContents
+       
     ElseIf answer = 7 Then
         varResult = Application.GetSaveAsFilename(filefilter:="Marco Enabled Workbook(*.xlsm), *xlsm")
         If varResult <> False Then
@@ -92,11 +108,17 @@ Sub speakAsync(ByVal content As String)
 End Sub
 
 Sub showMsgLater(ByVal laterTime As Variant, ByVal content As String)
-    Application.OnTime laterTime, "'showMsg """ & content & "'"
+    'https://stackoverflow.com/questions/31439866/multiple-variable-arguments-to-application-ontime
+    Application.OnTime laterTime, "'showMsg """ & content & """,""" & laterTime & "'"
 End Sub
 
-Sub showMsg(ByVal content As String)
-    Application.StatusBar = "##" & content & "   " & Left(Application.StatusBar, 80)
+Sub showMsg(ByVal content As String, Optional ByVal laterTime As Variant = "")
+    
+    If laterTime = "" Then
+        laterTime = Now
+    End If
+    
+    Application.StatusBar = Format(laterTime, "h:m") & " " & content & "   " & Left(Application.StatusBar, 80)
 End Sub
 
 Sub sheduleVoiceTips(ByVal sheetName As String, ByVal tobaccoName As String, ByVal producePhase As String, ByVal baseTime As Variant, ByVal delay As Integer)
@@ -111,13 +133,15 @@ Sub sheduleVoiceTips(ByVal sheetName As String, ByVal tobaccoName As String, ByV
     '遍历列表, 检查是否需要改变时间
     
     For Each tipSet In tipArray
+        '检查 tipset 是否用在这牌号上
+        
+        If tipSet.Exists("filter") Then
+            If Not IsInCollection(tobaccoName, tipSet("filter")) Then GoTo Continue
+        End If
+        
         '检查内容是否需要重置
-        If tipSet.Exists("redirect") Then
-            realContent = genNewContent(tobaccoName, tipSet("redirect"))
-        ElseIf tipSet.Exists("hdt") Then
-            '检查是否需要回掺HDT
-            If getParam(tobaccoName, "HDT掺配比例") = "" Then GoTo Continue
-            realContent = tipSet("hdt")
+        If tipSet.Exists("redirectList") Then
+            realContent = genNewContent(tobaccoName, tipSet("redirectList"))
         Else
             realContent = tipSet("content")
         End If
@@ -270,12 +294,16 @@ EH:
     MsgBox Err.Description & vbCrLf & "在设定表中无法找到: " & tobaccoName & " -> " & paramName & " 参数"
 End Function
 
-Function genNewContent(ByVal tobaccoName As String, ByVal paramName As String) As String
-    Dim param As String
+
+Function genNewContent(ByVal tobaccoName As String, ByRef paramCollection As Variant) As String
+    Dim newContent, param, paramContent As String
+    newContent = tobaccoName
     
-    param = getParam(tobaccoName, paramName)
+    For Each param In paramCollection
+        newContent = newContent & "," & param & getParam(tobaccoName, param)
+    Next
     
-    genNewContent = paramName & param
+    genNewContent = newContent
 
 End Function
 
@@ -284,9 +312,8 @@ Function adjustOffsetTime(ByVal tobaccoName As String, ByVal offsetTime As Integ
     Dim mainTobaccoVolume As Integer
     
     mainTobaccoVolume = getParam(tobaccoName, "主叶丝秤流量")
-    
-    'adjustOffsetTime = offsetTime * (6250 / mainTobaccoVolume)
-    
+    '偏移时间是以经典主叶丝秤流量为基准的, 其他牌号通过自己的流量换算出自己的偏移时间
+    '掺配和出现不同的偏移时间是因为主叶丝秤流量不同
     adjustOffsetTime = offsetTime + (9.375 - 0.0015 * mainTobaccoVolume)
 End Function
 
