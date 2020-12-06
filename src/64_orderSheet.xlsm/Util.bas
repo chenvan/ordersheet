@@ -71,22 +71,22 @@ Sub clearContent()
         Sheets("回潮段").Range("A3:A1171").ClearContents
         Sheets("回潮段").Range("C3:J1171").ClearContents
         Sheets("回潮段").Range("L3:M1171").ClearContents
-        Sheets("回潮段").Range("O3:O1171").ClearContents
-        Sheets("回潮段").Range("O3:O1171").Font.Color = vbBlack
+        Sheets("回潮段").Range("P3:P1171").ClearContents
+        Sheets("回潮段").Range("P3:P1171").Font.Color = vbBlack
         
         Sheets("加料段").Range("A3:A1321").ClearContents
         Sheets("加料段").Range("C3:D1321").ClearContents
         Sheets("加料段").Range("F3:J1321").ClearContents
         Sheets("加料段").Range("M3:M1321").ClearContents
-        Sheets("加料段").Range("O3:P1321").ClearContents
-        Sheets("加料段").Range("R3:R1321").ClearContents
-        Sheets("加料段").Range("R3:R1321").Font.Color = vbBlack
+        Sheets("加料段").Range("O3:Q1321").ClearContents
+        Sheets("加料段").Range("T3:T1321").ClearContents
+        Sheets("加料段").Range("T3:T1321").Font.Color = vbBlack
         
         Sheets("切烘加香段").Range("A3:A1251").ClearContents
         Sheets("切烘加香段").Range("C3:D1251").ClearContents
-        Sheets("切烘加香段").Range("G3:Z1251").ClearContents
-        Sheets("切烘加香段").Range("AB3:AB1251").ClearContents
-        Sheets("切烘加香段").Range("K3:K1251").Font.Color = vbBlack
+        Sheets("切烘加香段").Range("F3:Y1251").ClearContents
+        Sheets("切烘加香段").Range("AA3:AA1251").ClearContents
+        Sheets("切烘加香段").Range("J3:J1251").Font.Color = vbBlack
         
         
         Sheets("HDT段").Range("A3:E152").ClearContents
@@ -115,10 +115,10 @@ End Sub
 Sub showMsg(ByVal content As String, Optional ByVal laterTime As Variant = "")
     
     If laterTime = "" Then
-        laterTime = Now
+        laterTime = Time
     End If
     
-    Application.StatusBar = Format(laterTime, "h:m") & " " & content & "   " & Left(Application.StatusBar, 80)
+    Application.StatusBar = Format(laterTime, "hh:mm") & " " & content & "   " & Left(Application.StatusBar, 80)
 End Sub
 
 Sub sheduleVoiceTips(ByVal sheetName As String, ByVal tobaccoName As String, ByVal producePhase As String, ByVal baseTime As Variant, ByVal delay As Integer)
@@ -154,9 +154,8 @@ Sub sheduleVoiceTips(ByVal sheetName As String, ByVal tobaccoName As String, ByV
         End If
         
         'Debug.Print realContent
-        
         '装载语音
-        pushVoiceTip realContent, realOffsetTime + delay, baseTime, tipSet("isForceBroadcast")
+        pushVoiceTip realContent, realOffsetTime + delay, baseTime, tipSet("deadLineOffset")
        
 Continue:
     Next tipSet
@@ -214,25 +213,27 @@ Sub sheduleVoiceTipsAboutStore(ByVal storePlace As String, ByVal tobaccoName As 
             realOffsetTime = tipSet("sOffsetTime")
         End If
         
-        pushVoiceTip tipSet("content"), realOffsetTime + delay, baseTime, tipSet("isForceBroadcast")
+        pushVoiceTip tipSet("content"), realOffsetTime + delay, baseTime, tipSet("deadLineOffset")
     
     Next tipSet
 End Sub
 
-Sub pushVoiceTip(ByVal content As String, ByVal tsOffset, ByVal baseTime As Variant, ByVal isForceBroadcast As Boolean)
+Sub pushVoiceTip(ByVal content As String, ByVal tsOffset, ByVal baseTime As Variant, ByVal deadLineOffset As Integer)
 
     Dim triggerTime As Variant
-
+    Dim deadLineTime As Variant
+    
     triggerTime = baseTime + TimeSerial(0, tsOffset, 2)
+    deadLineTime = triggerTime + TimeSerial(0, deadLineOffset, 0)
 
-    If Time > triggerTime And isForceBroadcast Then
+    If triggerTime < Time And Time < deadLineTime Then
         speakLater Now, content
         showMsgLater Now, content
     ElseIf Time <= triggerTime Then
         speakLater triggerTime, content
         showMsgLater triggerTime, content
     Else
-        showMsg "超时,不进行以下提醒: $" & content
+        showMsg "超时,不进行提醒: $" & content
     End If
 End Sub
 
@@ -245,7 +246,7 @@ Sub runFirstBatchTip(ByVal sheetName As String)
     If found Is Nothing Then
         Util.showMsg "没有找到今天的日期"
     Else
-        firstTobaccoName = found.offset(0, 2).value
+        firstTobaccoName = found.Offset(0, 2).value
         '时间使用now的话会时间转换会溢出
         sheduleVoiceTips sheetName, firstTobaccoName, "第一批", Time, 0
     End If
@@ -257,7 +258,7 @@ Public Function loadTips(ByVal fLayerP As String, ByVal sLayerP As String) As Va
     Dim fullPath As String
     Dim allTips As Scripting.Dictionary
     
-    fullPath = Sheets("设定").Range("A:A").Find("语音文件路径").offset(0, 1).value
+    fullPath = Sheets("设定").Range("A:A").Find("语音文件路径").Offset(0, 1).value
     
     Set allTips = loadJsonFile(fullPath)
     Set loadTips = allTips(fLayerP)(sLayerP)
@@ -284,7 +285,7 @@ Function getParam(ByVal tobaccoName As String, ByVal paramName As String) As Var
     
     Dim rowIndex, columnIndex As Integer
  
-    rowIndex = Sheets("设定").Range("A2:A18").Find(tobaccoName, lookat:=xlWhole).Row
+    rowIndex = Sheets("设定").Range("A2:A25").Find(tobaccoName, lookat:=xlWhole).Row
     columnIndex = Sheets("设定").Range("A1:Z1").Find(paramName, lookat:=xlWhole).Column
     
     getParam = Sheets("设定").Cells(rowIndex, columnIndex)
@@ -294,6 +295,12 @@ EH:
     MsgBox Err.Description & vbCrLf & "在设定表中无法找到: " & tobaccoName & " -> " & paramName & " 参数"
 End Function
 
+
+Function getColumnIndex(ByVal sheetName As String, ByVal targetCol As String) As Integer
+
+    getColumnIndex = Sheets(sheetName).Range("A2:AZ2").Find(targetCol, lookat:=xlWhole).Column
+
+End Function
 
 Function genNewContent(ByVal tobaccoName As String, ByRef paramCollection As Variant) As String
     Dim newContent, param, paramContent As String
@@ -316,6 +323,7 @@ Function adjustOffsetTime(ByVal tobaccoName As String, ByVal offsetTime As Integ
     '掺配和出现不同的偏移时间是因为主叶丝秤流量不同
     adjustOffsetTime = offsetTime + (9.375 - 0.0015 * mainTobaccoVolume)
 End Function
+
 
 
 

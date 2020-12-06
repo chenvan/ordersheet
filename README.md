@@ -71,10 +71,13 @@
 先检查日期
 
 1. 日期栏是今天或者空白
-   - 时间已过, 如果isForceBroadcast 是 true , 立即进行提醒  
+   - ~~时间已过, 如果isForceBroadcast 是 true , 立即进行提醒  ~~
+   - 现在的时间没有超过deadLineOffset + 本来要播报的时间就进行播报
 2. 日期栏过期
    - 不进行提醒
 
+
+	
 
 
 ## 状态栏文字提醒
@@ -170,9 +173,9 @@ HDT段的表先改为不保护的状态(未完成)
 
     "sOffsetTime": int,
 
-    "OffsetTime": int,
+    "aOffsetTime": int,
 
-    "isForceBroadcast": boolen,
+    "deadLineOffset": int,
     
     "filter": array,
 
@@ -183,7 +186,7 @@ HDT段的表先改为不保护的状态(未完成)
 }
 ```
 
-isForceBroadcast 是 true, 则超时也需要播报该语音
+deadLineOffset +本来应播报的时间就是最后需要播报该语音的时间
 
 sOffsetTime与aOffsetTime两者只会有一
 
@@ -230,22 +233,23 @@ JSON 文件的编码需要是 ANSI, 否则中文会变为乱码且无法正确�
 ### 序号为第5, 9, 则为true
 
 #### 列
-
+```
 AND(CELL("col") = COLUMN(), OR(INDIRECT(ADDRESS(CELL("row"), 2)) = 5, INDIRECT(ADDRESS(CELL("row"), 2)) = 9))
-
+```
 #### 行
-
+```
 AND(CELL("row") = ROW(), OR($B2 = 5, $B2 = 9))
-
+```
 ### 序号不是第5, 9, 则为true
 
 #### 列
-
+```
 AND(CELL("col")=COLUMN(), AND(INDIRECT(ADDRESS(CELL("row"), 2)) <> 5, INDIRECT(ADDRESS(CELL("row"), 2)) <> 9))
-
+```
 #### 行
-
+```
 AND(CELL("row")=ROW(), $B2 <> 5, $B2 <> 9)
+```
 
 
 
@@ -255,9 +259,15 @@ vlookup写对了可以自动应对插入列的问题
 
 首先第二个参数"寻找的范围"可以自动更新
 
-第三个参数使用 colum(表名!列1) - colum(表名!列2) + 1 也能进行自动更新
+第三个参数使用 colum(表名!单元格1) - colum(表名!单元格2) + 1 也能进行自动更新
 
 
+
+## 烘丝料头温度的升温过程
+1. 起始点温度知道
+2. 最终温度在变化(变化不大)
+3. 升温时间已知
+3. 温度惯性较大, 升温过程需要先快后慢
 
 
 
@@ -266,9 +276,10 @@ vlookup写对了可以自动应对插入列的问题
 1. offset时间精确到秒
 2. ~~水分汇总用vba代码（查看解决其他表插入列后会令水分汇总表数据错乱的问题)~~
 3. ~~语音逻辑增加filter功能~~
-4. ~~状态栏文字提醒加上时间~~
+4. ~~状态栏文字提醒加上时间~~(时间格式不一样)
 5. ~~修改cleanContent函数, 把文字颜色也清除掉~~
 6. 取消提醒(?)
-7. 提醒的过期逻辑
+7. 提醒的过期逻辑需要重新思考
 8. ~~切烘加香表加一栏加料出口水分~~
+9. ck1的转换
 

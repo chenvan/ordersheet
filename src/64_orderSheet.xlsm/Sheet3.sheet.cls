@@ -1,5 +1,3 @@
-Option Explicit
-
 Private Sub Worksheet_Change(ByVal target As Range)
     Dim timeFormatColumns As Variant
     timeFormatColumns = Array(7, 8)
@@ -28,9 +26,9 @@ Private Sub Worksheet_Change(ByVal target As Range)
             '开始时间列触发批开始语音提醒
             Dim storeName As String
             
-            currentTobacco = target.offset(0, 3 - target.Column).value
-            dateOfSelectedRow = target.offset(0, 1 - target.Column).value
-            storeName = target.offset(0, 6 - target.Column).value
+            currentTobacco = target.Offset(0, 3 - target.Column).value
+            dateOfSelectedRow = target.Offset(0, 1 - target.Column).value
+            storeName = target.Offset(0, 6 - target.Column).value
             
             'Debug.Print (currentTobacco)
             'Debug.Print dateOfSelectedRow
@@ -61,8 +59,8 @@ Private Sub Worksheet_Change(ByVal target As Range)
             Dim feedLiquidSweepDelay As Integer
             feedLiquidSweepDelay = 0
             
-            currentTobacco = target.offset(0, 3 - target.Column).value
-            nextTobacco = target.offset(1, 3 - target.Column).value
+            currentTobacco = target.Offset(0, 3 - target.Column).value
+            nextTobacco = target.Offset(1, 3 - target.Column).value
             
             If nextTobacco = "" Then
                 '提醒写下一批次的烟牌,并重新填写这一批次的结束时间
@@ -71,7 +69,7 @@ Private Sub Worksheet_Change(ByVal target As Range)
                 Exit Sub
             End If
             
-            dateOfSelectedRow = target.offset(0, 1 - target.Column).value
+            dateOfSelectedRow = target.Offset(0, 1 - target.Column).value
             
             '行的日期为今天或者是空内容时才进行提醒
             If dateOfSelectedRow = Date Or IsEmpty(dateOfSelectedRow) Then

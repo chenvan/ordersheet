@@ -1,10 +1,28 @@
 Option Explicit
 
+Private Sub Workbook_Activate()
+    '禁止使用剪切
+    Application.CommandBars("cell").Controls(1).Enabled = False
+    Application.OnKey "^x", ""
+End Sub
+
+Private Sub Workbook_BeforeClose(Cancel As Boolean)
+    Application.CommandBars("cell").Controls(1).Enabled = True
+    Application.OnKey "^x"
+End Sub
+
+Private Sub Workbook_Deactivate()
+    Application.CommandBars("cell").Controls(1).Enabled = True
+    Application.OnKey "^x"
+End Sub
+
+
+
 Private Sub Workbook_Open()
     '自动备份
     Application.OnTime TimeValue("12:10:00"), "AutoBackup.AutoBackup"
     Application.OnTime TimeValue("22:10:00"), "AutoBackup.AutoBackup"
-    
+
 End Sub
 
 Private Sub Workbook_SheetChange(ByVal Sh As Object, ByVal target As Range)
@@ -17,7 +35,7 @@ Private Sub Workbook_SheetChange(ByVal Sh As Object, ByVal target As Range)
         
         If ((Util.IsInArray(Sh.Name, sheetNames) And target.Column = 4) Or (target.Column = 3 And Sh.Name = "HDT段")) And Util.IsNum(target.value) Then
             Dim tobaccoCode As String
-            tobaccoCode = Tobacco.GetTobaccoCode(target.offset(0, -1).value, "设定")
+            tobaccoCode = Tobacco.GetTobaccoCode(target.Offset(0, -1).value, "设定")
             
             If tobaccoCode <> "" Then
                 Dim segments() As String

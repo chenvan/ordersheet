@@ -33,7 +33,7 @@ Function GetTobaccoCode(ByVal tobaccoName As String, ByVal sheetNameWithCode As 
     If tobaccoName <> "" Then
         Dim found As Range
         Set found = Sheets(sheetNameWithCode).Range("A:A").Find(tobaccoName, , , xlWhole)
-        tobaccoCode = found.offset(0, 1).value
+        tobaccoCode = found.Offset(0, 1).value
     End If
 
     GetTobaccoCode = tobaccoCode
