@@ -2,24 +2,9 @@
 	"回潮": {
 		"第一批": [
 			{
-				"sOffsetTime" : 15,
-				"deadLineOffset": 30,
-				"content" : "记得填写回潮开始时间"
-			},
-			{
-				"sOffsetTime" : 10,
-				"deadLineOffset": 30,
-				"content" : "暂存柜启动"
-			},
-			{
-				"sOffsetTime" : 3,
-				"deadLineOffset": 30,
-				"content" : "确认回潮机水分仪通道号"
-			},
-			{
 				"sOffsetTime" : 2,
 				"deadLineOffset": 30,
-				"content" : "确认所有工单产量正确"
+				"content" : "确认所有工单产量"
 			},
 			{
 				"sOffsetTime" : 1,
@@ -34,73 +19,48 @@
 			{
 				"sOffsetTime" : 0,
 				"deadLineOffset": 30,
-				"content" : "进行回潮段检查"
+				"content" : "六四回潮段进行检查"
 			}
 		],
 		"开始前": [
 			{
 				"sOffsetTime" : 21,
 				"deadLineOffset": 30,
-				"content" : "填写回潮开始时间"
+				"content" : "六四回潮记得填写开始时间"
 			},
 			{
-				"sOffsetTime" : 20,
+				"sOffsetTime" : 18,
 				"deadLineOffset": 30,
-				"content" : "暂存柜启动"
+				"content" : "六四除杂后暂存柜启动"
 			},
 			{
-				"sOffsetTime" : 19,
+				"sOffsetTime" : 17,
 				"deadLineOffset": 30,
-				"content" : "转回潮工单, 筒速为八转"
+				"content" : "六四回潮转工单, 确认水分仪通道号"
 			}
 		],
 		"开始后": [
 			{
 				"sOffsetTime" : 5,
 				"deadLineOffset": 30,
-				"content" : "暂存柜进叶"
+				"content" : "六四除杂后暂存柜进叶"
 			},
 			{
 				"sOffsetTime" : 3,
 				"deadLineOffset": 30,
-				"content" : "查看回潮热风温度，加水流量"
+				"content" : "六四回潮检查热风温度，加水流量"
 			}
 		],
 		"结束后": [
 			{
 				"sOffsetTime" : 2,
 				"deadLineOffset": 30,
-				"content" : "切片回潮预填"
+				"content" : "六四切片回潮进行预填"
 			}
 		]
 	},
 	"加料": {
 		"第一批": [
-			{
-				"sOffsetTime" : 21,
-				"deadLineOffset": 30,
-				"content" : "储叶柜启动"
-			},
-			{
-				"sOffsetTime" : 20,
-				"deadLineOffset": 30,
-				"content" : "记得填写加料开始时间"
-			},
-			{
-				"sOffsetTime" : 15,
-				"deadLineOffset": 30,
-				"content" : "确认加料机风机频率，加料比例"
-			},
-			{
-				"sOffsetTime" : 12,
-				"deadLineOffset": 30,
-				"content" : "检查加料罐温度"
-			},
-			{
-				"sOffsetTime" : 10,
-				"deadLineOffset": 30,
-				"content" : "确认加料水分仪通道号"
-			},
 			{
 				"sOffsetTime" : 0,
 				"deadLineOffset": 30,
@@ -116,90 +76,52 @@
 			{
 				"sOffsetTime" : 21,
 				"deadLineOffset": 30,
-				"content" : "储叶柜启动"
+				"content" : "六四加料记得填写开始时间"
 			},
 			{
-				"sOffsetTime" : 21,
+				"sOffsetTime" : 19,
 				"deadLineOffset": 30,
-				"content" : "填写加料开始时间"
-			},
-			{
-				"sOffsetTime" : 18,
-				"deadLineOffset": 30,
-				"content" : "确认加料机风机频率，加料比例"
-			},
-			{
-				"sOffsetTime" : 18,
-				"deadLineOffset": 30,
-				"content" : "检查加料罐温度"
+				"content" : "六四储叶柜启动"
 			},
 			{
 				"sOffsetTime" : 17,
 				"deadLineOffset": 30,
-				"content" : "确认加料水分仪通道号"
+				"content" : "六四加料确认水分仪通道号"
 			},
 			{
-				"sOffsetTime": 17,
+				"sOffsetTime": 14,
 				"deadLineOffset": 30,
-				"redirectList": ["加料比例"]
+				"redirectList": ["加料比例", "加料出口温度", "风机频率", "料液温度"]
 			}
 		],
 		"开始后": [
 			{
-				"sOffsetTime" : 8,
-				"deadLineOffset": 30,
-				"content" : "查看加料出口温度，水分"
-			},
-			{
 				"sOffsetTime" : 10,
 				"deadLineOffset": 30,
-				"content" : "查看热风回风温度PID开度"
-			}
-		],
-		"结束后": [
+				"content" : "六四加料查看热风回风温度PID开度"
+			},
+			{
+				"sOffsetTime" : 8,
+				"deadLineOffset": 30,
+				"content" : "六四加料检查加料出口温度，水分"
+			},
 			{
 				"sOffsetTime" : 3,
 				"deadLineOffset": 30,
-				"content" : "检查电子秤流量曲线"
-			},
+				"content" : "六四加料开始喷料，使用二二五镜头查看加料出口"
+			}
+			
+		],
+		"结束后": [
 			{
 				"sOffsetTime" : 2,
 				"deadLineOffset": 30,
-				"content" : "查看加料比例变异系数"
+				"content" : "六四加料检查加料比例变异系数"
 			}
 		]
 	},
 	"切烘加香": {
 		"第一批": [
-			{
-				"sOffsetTime" : 18,
-				"deadLineOffset": 30,
-				"content" : "记得填写烘丝开始时间"
-			},
-			{
-				"sOffsetTime" : 15,
-				"deadLineOffset": 30,
-				"filter": ["双喜（经典）"],
-				"content" : "HDT秤预填完成"
-			},
-			{
-				"sOffsetTime" : 12,
-				"deadLineOffset": 30,
-				"filter": ["双喜（经典）"],
-				"content" : "镜头二零一查看HDT出料"
-			},
-			{
-				"sOffsetTime" : 11,
-				"deadLineOffset": 30,
-				"filter": ["双喜（经典）"],
-				"content" : "确认HDT水分仪通道号"
-			},
-			{
-				"sOffsetTime" : 10,
-				"deadLineOffset": 30,
-				"filter": ["双喜（经典）"],
-				"content" : "转HDT工单"
-			},
 			{
 				"sOffsetTime" : 10,
 				"deadLineOffset": 30,
@@ -253,9 +175,14 @@
 		],
 		"开始前": [
 			{
+				"sOffsetTime" : 30,
+				"deadLineOffset": 30,
+				"content" : "六四留意烘丝入口水分，计算主叶丝秤流量是否合适"
+			},
+			{
 				"sOffsetTime" : 26,
 				"deadLineOffset": 30,
-				"content" : "记得填写烘丝开始时间"
+				"content" : "六四烘丝记得填写开始时间"
 			},
 			{
 				"sOffsetTime" : 22,
@@ -265,117 +192,111 @@
 			{
 				"sOffsetTime" : 21,
 				"deadLineOffset": 30,
-				"content" : "入柜状态为待料，防止撞线"
+				"content" : "六四检查进柜状态为待料，检查是否撞线"
 			},
 			{
 				"sOffsetTime" : 20,
 				"deadLineOffset": 30,
-				"content" : "确认烘丝水分仪通道号"
+				"content" : "六四烘丝水分仪通道号确认"
 			},
 			{
 				"sOffsetTime" : 6,
 				"deadLineOffset": 30,
-				"content" : "转切丝工单，检查出柜状态"
+				"content" : "六四切丝转工单，检查贮叶柜出柜状态"
 			},
 			{
-				"sOffsetTime" : 0,
+				"sOffsetTime" : -8,
 				"deadLineOffset": 30,
 				"filter": ["双喜（莲香）"],
-				"content": "调低出柜底带频率"
+				"content": "调低莲香出柜底带频率"
 			},
 			{
-				"sOffsetTime" : 0,
+				"sOffsetTime" : -8,
 				"deadLineOffset": 30,
 				"filter": ["双喜（莲香）", "双喜（经典1906）"],
-				"content" : "储叶时间大于3小时"
-			},
-			{
-				"sOffsetTime" : 19,
-				"deadLineOffset": 30,
-				"filter": ["双喜（经典）"],
-				"content" : "确认HDT水分仪通道号"
+				"content" : "六四莲香, 经典1906储叶时间大于3小时"
 			},
 			{
 				"sOffsetTime" : 18,
 				"deadLineOffset": 30,
 				"filter": ["双喜（经典）"],
-				"content" : "HDT秤预填完成"
+				"content" : "六四确认HDT预填完成，检查HDT水分仪通道号"
 			},
 			{
 				"sOffsetTime" : 17,
 				"deadLineOffset": 30,
 				"filter": ["双喜（经典）"],
-				"content" : "镜头二零一查看HDT出料"
+				"content" : "六四二零一镜头查看HDT出料"
 			},
 			{
 				"sOffsetTime" : 15,
 				"deadLineOffset": 30,
 				"filter": ["双喜（经典）"],
-				"content" : "转HDT工单"
+				"content" : "六四转HDT工单"
 			}
 		],
 		"开始后": [
 			{
 				"aOffsetTime" : 25,
 				"deadLineOffset": 30,
-				"content" : "留意加香机出口水分"
+				"content" : "六四加香出口水分检查"
 			},
 			{
 				"aOffsetTime" : 21,
 				"deadLineOffset": 30,
 				"filter": ["双喜（莲香）"],
-				"content" : "留意膨丝秤"
+				"content" : "六四莲香留意膨丝秤情况"
 			},
 			{
 				"aOffsetTime" : 19,
 				"deadLineOffset": 30,
-				"content" : "烟到一三七镜头"
+				"content" : "六四烟到一三七镜头"
 			},
 			{
 				"aOffsetTime" : 18,
 				"deadLineOffset": 30,
-				"content" : "开始加香"
+				"content" : "六四加香筒开始喷料"
 			},
 			{
 				"aOffsetTime" : 17,
 				"deadLineOffset": 30,
-				"content" : "烟到一一九镜头"
+				"content" : "六四烟到一一九镜头"
 			},
 			{
 				"aOffsetTime" : 16,
 				"deadLineOffset": 30,
-				"content" : "主叶丝秤上烟"
+				"content" : "六四主叶丝秤上烟"
 			},
 			{
 				"sOffsetTime" : 11,
 				"deadLineOffset": 30,
-				"content" : "梗丝秤，膨丝秤填充完成"
+				"content" : "六四检查梗丝秤，膨丝秤填充状态"
 			},
 			{
 				"sOffsetTime" : 11,
 				"deadLineOffset": 30,
-				"content" : "提醒加香机开机"
+				"content" : "六四提醒加香机开机, 查看加香电机频率"
 			},
 			{
 				"sOffsetTime" : 10,
 				"deadLineOffset": 30,
-				"content" : "烟到风选"
+				"content" : "烟到六四风选出口"
 			},
 			{
 				"sOffsetTime" : 8,
 				"deadLineOffset": 30,
 				"filter": ["双喜（经典）"],
-				"content" : "hdt秤启动, 查看一九八镜头"
+				"content" : "六四一九八镜头查看hdt秤启动"
 			},
 			{
 				"sOffsetTime" : 7,
 				"deadLineOffset": 30,
-				"content" : "查看烘丝出口水分，筒温"
+				"content" : "六四查看烘丝出口水分，筒温"
 			},
 			{
 				"sOffsetTime" : 2,
 				"deadLineOffset": 30,
-				"content" : "烘丝出口振槽翻板门关闭"
+				"content" : "六四烘丝出口振槽翻板门关闭"
 			},
 			{
 				"sOffsetTime" : 8,
@@ -387,35 +308,35 @@
 			{
 				"sOffsetTime" : 21,
 				"deadLineOffset": 30,
-				"content" : "查看三丝秤变异系数，加香比例变异系数"
+				"content" : "六四查看三丝秤变异系数，加香比例变异系数"
 			},
 			{
 				"sOffsetTime" : 16,
 				"deadLineOffset": 30,
-				"content" : "留意膨丝秤，梗丝秤尾料"
+				"content" : "六四注意膨丝秤，梗丝秤尾料"
 			},
 			{
 				"sOffsetTime" : 14,
 				"deadLineOffset": 30,
 				"filter": ["双喜（经典）"],
-				"content" : "结束HDT工单"
+				"content" : "六四结束HDT工单"
 			},
 			{
 				"sOffsetTime" : 8,
 				"deadLineOffset": 30,
 				"filter": ["双喜（经典）"],
-				"content" : "留意HDT秤尾料"
+				"content" : "六四留意HDT秤尾料"
 			},
 			{
 				"sOffsetTime" : 2,
 				"deadLineOffset": 30,
-				"content" : "有回掺需通知膨丝中控"
+				"content" : "六四有回掺需通知膨丝中控, HDT掺配工"
 			},
 			{
-				"sOffsetTime" : 2,
+				"sOffsetTime" : 1,
 				"deadLineOffset": 30,
 				"filter": ["双喜（莲香）"],
-				"content" : "上一批莲香出柜底带频率调回"
+				"content" : "六四莲香叶柜出柜完成后, 更正底带频率"
 			}
 		]
 	},
@@ -424,14 +345,19 @@
 			{
 				"sOffsetTime" : 4,
 				"deadLineOffset": 30,
-				"content" : "烟进储叶柜"
+				"content" : "六四二一九镜头检查储叶柜进烟情况"
 			}
 		],
 		"HDT": [
 			{
-				"sOffsetTime" : 15,
+				"sOffsetTime" : 5,
 				"deadLineOffset": 30,
-				"content" : "烟进HDT柜"
+				"content" : "六四二一四镜头检查HDT柜进烟情况"
+			},
+			{
+				"sOffsetTime" : 4,
+				"deadLineOffset": 30,
+				"content" : "六四烟到二三四镜头"
 			}
 		]
 	},
@@ -440,74 +366,74 @@
 			{
 				"aOffsetTime" : 23,
 				"deadLineOffset": 30,
-				"content" : "烟到南AF"
+				"content" : "六四烟到南AF"
 			}
 		],
 		"南GM": [
 			{
-				"aOffsetTime" : 21,
+				"aOffsetTime" : 20,
 				"deadLineOffset": 30,
-				"content" : "烟到南GM"
+				"content" : "六四烟到南GM"
 			}
 		],
 		"南NT": [
 			{
 				"aOffsetTime" : 23,
 				"deadLineOffset": 30,
-				"content" : "烟到南NT"
+				"content" : "六四烟到南NT"
 			}
 		],
 		"木AC": [
 			{
 				"aOffsetTime" : 20,
 				"deadLineOffset": 30,
-				"content" : "烟到一一三镜头"
+				"content" : "六四烟到一一三镜头"
 			},
 			{
 				"aOffsetTime" : 23,
 				"deadLineOffset": 30,
-				"content" : "烟到木箱AC"
+				"content" : "六四烟到木箱AC"
 			}
 		],
 		"北AD": [
 			{
 				"aOffsetTime" : 20,
 				"deadLineOffset": 30,
-				"content" : "烟到一一三镜头"
+				"content" : "六四烟到一一三镜头"
 			},
 			{
 				"aOffsetTime" : 26,
 				"deadLineOffset": 30,
-				"content" : "烟到115镜头"
+				"content" : "六四烟到一一五镜头"
 			},
 			{
 				"aOffsetTime" : 30,
 				"deadLineOffset": 30,
-				"content" : "烟到北区AD"
+				"content" : "六四烟到北区AD"
 			}
 		],
 		"北EH": [
 			{
 				"aOffsetTime" : 20,
 				"deadLineOffset": 30,
-				"content" : "烟到一一三镜头"
+				"content" : "六四烟到一一三镜头"
 			},
 			{
 				"aOffsetTime" : 25,
 				"deadLineOffset": 30,
-				"content" : "烟到115镜头"
+				"content" : "六四烟到一一五镜头"
 			},
 			{
 				"aOffsetTime" : 30,
 				"deadLineOffset": 30,
-				"content" : "烟到北区EH"
+				"content" : "六四烟到北区EH"
 			}
 		],
 		"外AB": [
 			{
 				"aOffsetTime" : 15,
 				"deadLineOffset": 30,
-				"content" : "烟到外运柜"
+				"content" : "六四烟到外运柜"
 			}
 		]
 	}

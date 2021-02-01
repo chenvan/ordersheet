@@ -1,20 +1,26 @@
 Private Sub Worksheet_Change(ByVal target As Range)
     Dim timeFormatColumns As Variant
-    timeFormatColumns = Array(8, 9)
-    
+    timeFormatColumns = Array(4)
+
     If Not IsArray(target.value) Then
-    
+        Dim dateOfSelectedRow As Variant
+        
+        dateOfSelectedRow = target.Offset(0, 1 - target.Column).value
+        
         If Util.IsInArray(target.Column, timeFormatColumns) And Util.IsNum(target.value) Then
             'inputTime's column is time format, which is a double type
             'we input an int, but it will change to double type
-            If Util.IsIntType(target.value) Then
-                target.value = Others.ParseInputTime(target.value)
-            End If
             
+            If Util.IsIntType(target.value) Then
+                Application.EnableEvents = False
+                target.value = Util.ParseInputTime(target.value, dateOfSelectedRow)
+                Application.EnableEvents = True
+            End If
+
         End If
-    
+
     End If
-    
+
 End Sub
 
 'Public Sub sync96HDT()

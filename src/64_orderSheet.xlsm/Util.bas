@@ -1,5 +1,22 @@
 Attribute VB_Name = "Util"
 Option Explicit
+Function ParseInputTime(ByVal abbrTime As Integer, ByVal dt As Variant) As Date
+    
+    Dim hour As Integer
+    Dim min As Integer
+    
+    If dt = 0 Then
+        MsgBox "请填写日期"
+    ElseIf abbrTime > 2400 Then
+        MsgBox "时间不能超过2400"
+    Else
+        hour = Int(abbrTime / 100)
+        min = Int(abbrTime Mod 100)
+    
+        ParseInputTime = dt + TimeSerial(hour, min, 0)
+    End If
+
+End Function
 
 Function IsInArray(ByVal beFound As Variant, ByRef arr As Variant) As Boolean
     Dim i As Integer
@@ -79,8 +96,8 @@ Sub clearContent()
         Sheets("加料段").Range("F3:J1321").ClearContents
         Sheets("加料段").Range("M3:M1321").ClearContents
         Sheets("加料段").Range("O3:Q1321").ClearContents
-        Sheets("加料段").Range("T3:T1321").ClearContents
-        Sheets("加料段").Range("T3:T1321").Font.Color = vbBlack
+        Sheets("加料段").Range("V3:V1321").ClearContents
+        Sheets("加料段").Range("V3:V1321").Font.Color = vbBlack
         
         Sheets("切烘加香段").Range("A3:A1251").ClearContents
         Sheets("切烘加香段").Range("C3:D1251").ClearContents
@@ -115,7 +132,7 @@ End Sub
 Sub showMsg(ByVal content As String, Optional ByVal laterTime As Variant = "")
     
     If laterTime = "" Then
-        laterTime = Time
+        laterTime = Now
     End If
     
     Application.StatusBar = Format(laterTime, "hh:mm") & " " & content & "   " & Left(Application.StatusBar, 80)
@@ -134,7 +151,6 @@ Sub sheduleVoiceTips(ByVal sheetName As String, ByVal tobaccoName As String, ByV
     
     For Each tipSet In tipArray
         '检查 tipset 是否用在这牌号上
-        
         If tipSet.Exists("filter") Then
             If Not IsInCollection(tobaccoName, tipSet("filter")) Then GoTo Continue
         End If
@@ -226,10 +242,10 @@ Sub pushVoiceTip(ByVal content As String, ByVal tsOffset, ByVal baseTime As Vari
     triggerTime = baseTime + TimeSerial(0, tsOffset, 2)
     deadLineTime = triggerTime + TimeSerial(0, deadLineOffset, 0)
 
-    If triggerTime < Time And Time < deadLineTime Then
+    If triggerTime < Now And Now < deadLineTime Then
         speakLater Now, content
         showMsgLater Now, content
-    ElseIf Time <= triggerTime Then
+    ElseIf Now <= triggerTime Then
         speakLater triggerTime, content
         showMsgLater triggerTime, content
     Else
@@ -237,18 +253,33 @@ Sub pushVoiceTip(ByVal content As String, ByVal tsOffset, ByVal baseTime As Vari
     End If
 End Sub
 
-Sub runFirstBatchTip(ByVal sheetName As String)
+'Sub runFirstBatchTip(ByVal sheetname As String)
+'    '需要修改逻辑
+'    Dim found As Range
+'    Dim firstTobaccoName As String
+'    'find today's first row
+'    Set found = Sheets(sheetname + "段").Range("A:A").Find(Date)
+'
+'    If found Is Nothing Then
+'        Util.showMsg "没有找到今天的日期"
+'    Else
+'        firstTobaccoName = found.Offset(0, 2).value
+'        sheduleVoiceTips sheetname, firstTobaccoName, "第一批", Now, 0
+'    End If
+'End Sub
+
+Sub checkBeforeWork(ByVal sheetName As String)
     Dim found As Range
     Dim firstTobaccoName As String
     'find today's first row
-    Set found = Sheets(sheetName & "段").Range("A:A").Find(Date)
-    
+    Set found = Sheets(sheetName + "段").Range("A:A").Find(Date)
+
     If found Is Nothing Then
         Util.showMsg "没有找到今天的日期"
     Else
         firstTobaccoName = found.Offset(0, 2).value
-        '时间使用now的话会时间转换会溢出
-        sheduleVoiceTips sheetName, firstTobaccoName, "第一批", Time, 0
+        sheduleVoiceTips sheetName, "", "第一批", Now, 0
+        sheduleVoiceTips sheetName, firstTobaccoName, "开始前", Now, 0
     End If
 End Sub
 
@@ -324,7 +355,127 @@ Function adjustOffsetTime(ByVal tobaccoName As String, ByVal offsetTime As Integ
     adjustOffsetTime = offsetTime + (9.375 - 0.0015 * mainTobaccoVolume)
 End Function
 
+Function countSequentialTobaccoNum(ByVal tobaccoName As String, ByVal sheetName As String, ByVal dateColIndex As Integer, ByVal tobaccoColIndex As Integer, ByVal lastRowIndex As Integer) As Integer
+    Dim prevTobaccoName As String
+    Dim currentDate, prevDate As Variant
+    Dim count As Integer
+    
+    count = 0
+    
+    prevTobaccoName = Sheets(sheetName).Cells(lastRowIndex, tobaccoColIndex).value
+    prevDate = Sheets(sheetName).Cells(lastRowIndex, dateColIndex).value
+    currentDate = Sheets(sheetName).Cells(lastRowIndex + 1, dateColIndex).value
+    
+    While tobaccoName = prevTobaccoName And currentDate = prevDate
+        count = count + 1
+        prevTobaccoName = Sheets(sheetName).Cells(lastRowIndex - count, tobaccoColIndex).value
+        prevDate = Sheets(sheetName).Cells(lastRowIndex - count, dateColIndex).value
+    Wend
+    
+    countSequentialTobaccoNum = count
+End Function
 
+Function getAddEssenceSweepDelay(ByVal tobaccoName As String, ByVal dateColIndex As Integer, ByVal tobaccoColIndex As Integer, ByVal serialNumColIndex As Integer, ByVal lastRowIndex As Integer) As Integer
+    Dim count, delay, serialNum As Integer
+
+    count = countSequentialTobaccoNum(tobaccoName, "切烘加香段", dateColIndex, tobaccoColIndex, lastRowIndex)
+    delay = 8
+    
+    If count Mod 3 = 0 Then
+        '三批同牌号清洗一次
+        delay = 8
+    ElseIf count > 0 Then
+        serialNum = Sheets("切烘加香段").Cells(lastRowIndex, serialNumColIndex).value
+        '第4批和第8批加香机需要清扫, 延时4分钟上烟
+        If serialNum = 4 Or serialNum = 8 Then
+            delay = 4
+        Else
+            delay = 0
+        End If
+    End If
+'    Debug.Print count
+'    Debug.Print delay
+    getAddEssenceSweepDelay = delay
+End Function
+
+Function getFeedLiquidSweepDelay(ByVal tobaccoName As String, ByVal dateColIndex As Integer, ByVal tobaccoColIndex As Integer, ByVal lastRowIndex As Integer) As Integer
+    Dim count, delay As Integer
+    
+    count = countSequentialTobaccoNum(tobaccoName, "加料段", dateColIndex, tobaccoColIndex, lastRowIndex)
+    delay = 10
+    
+    If count Mod 4 = 0 Then
+        '四批同牌号清洗一次
+        delay = 10
+    ElseIf count > 0 Then
+        delay = 0
+    End If
+    
+    getFeedLiquidSweepDelay = delay
+    
+End Function
+
+Function guessFinishTime(sheetName As String) As String
+
+    Dim endTimeColIndex, tobaccoNameColIndex As Integer
+    Dim tobaccoNameLastRow, endTimeLastRow As Integer
+    Dim switchBaseTime, switchAddTime, tobaccoFinishTime As Integer
+    Dim index As Integer
+    Dim beginTime, endTime As Date
+    Dim output, tobaccoName As String
+
+    endTimeColIndex = Util.getColumnIndex(sheetName, "结束时间")
+    '牌号的 colIndex 基本不会变, 都是第三列
+    tobaccoNameColIndex = 3
+    output = ""
+    switchBaseTime = Sheets("设定").Range("A:A").Find(sheetName + "转烟时间").Offset(0, 1).value
+
+    tobaccoNameLastRow = Cells(Rows.count, tobaccoNameColIndex).End(xlUp).Row + 1
+    endTimeLastRow = Cells(Rows.count, endTimeColIndex).End(xlUp).Row + 1
+
+    tobaccoName = Cells(endTimeLastRow, tobaccoNameColIndex).value
+
+    If Cells(endTimeLastRow, endTimeColIndex - 1).value = "" Then
+        'beginTime is empty
+        switchAddTime = 0
+        If sheetName = "加料段" Then
+            switchAddTime = Util.getFeedLiquidSweepDelay(tobaccoName, 1, 3, endTimeLastRow - 1)
+        ElseIf sheetName = "切烘加香段" Then
+            switchAddTime = Util.getAddEssenceSweepDelay(tobaccoName, 1, 3, 2, endTimeLastRow - 1)
+        End If
+        beginTime = DateAdd("n", switchBaseTime + switchAddTime, Cells(endTimeLastRow - 1, endTimeColIndex).value)
+    Else
+        beginTime = Cells(endTimeLastRow, endTimeColIndex - 1).value
+    End If
+
+
+    For index = endTimeLastRow To tobaccoNameLastRow - 1
+
+        tobaccoFinishTime = Util.getParam(tobaccoName, sheetName + "生产时长")
+
+        endTime = DateAdd("n", tobaccoFinishTime, beginTime)
+
+        output = output + tobaccoName + " : " + Format(beginTime, "hh:mm") + " - " + Format(endTime, "hh:mm") + vbCrLf
+
+        tobaccoName = Cells(index + 1, tobaccoNameColIndex).value
+
+        switchAddTime = 0
+
+        If sheetName = "加料段" Then
+            switchAddTime = Util.getFeedLiquidSweepDelay(tobaccoName, 1, 3, index)
+        ElseIf sheetName = "切烘加香段" Then
+            switchAddTime = Util.getAddEssenceSweepDelay(tobaccoName, 1, 3, 2, index)
+        End If
+
+        beginTime = DateAdd("n", switchBaseTime + switchAddTime, endTime)
+
+'        Debug.Print switchAddTime
+'        Debug.Print beginTime
+    Next
+
+    guessFinishTime = output
+
+End Function
 
 
 
