@@ -6,25 +6,34 @@ Private Sub Worksheet_Change(ByVal target As Range)
         Dim beginTimeColumn, endTimeColumn As Integer
         Dim currentTobacco, nextTobacco As String
         Dim dateOfSelectedRow As Variant
+        Dim oldTargetValue As Variant
         
         beginTimeColumn = 6
         endTimeColumn = 7
         
         dateOfSelectedRow = target.Offset(0, 1 - target.Column).value
         
-        If Util.IsInArray(target.Column, timeFormatColumns) And Util.IsNum(target.value) Then
+        If Util.IsInArray(target.Column, timeFormatColumns) And IsNumeric(target.value) Then
             'inputTime's column is time format, which is a double type
             'we input an int, but it will change to double type
             
             If Util.IsIntType(target.value) Then
                 Application.EnableEvents = False
-                target.value = Util.ParseInputTime(target.value, dateOfSelectedRow)
+                
+                Application.Undo
+                oldTargetValue = target.value
+                Application.Undo
+                
+                If target.value <> "" Then
+                    target.value = Util.ParseInputTime(target.value, dateOfSelectedRow)
+                End If
+                
                 Application.EnableEvents = True
             End If
             
         End If
         
-        If target.Column = beginTimeColumn And Util.IsNum(target.value) Then
+        If target.Column = beginTimeColumn And IsNumeric(target.value) Then
             '开始时间列触发批开始语音提醒
             
             currentTobacco = target.Offset(0, 3 - target.Column).value
@@ -32,14 +41,22 @@ Private Sub Worksheet_Change(ByVal target As Range)
    
             '行的日期为今天或者是空内容时才进行提醒
             If dateOfSelectedRow = Date Then
-                Util.sheduleVoiceTips "回潮", currentTobacco, "开始后", target.value, 0
+                If oldTargetValue <> "" Then
+                    '取消用上一时间锚定的提醒
+                    Util.showMsg "取消以" & Format(oldTargetValue, "hh:mm") & "为锚定的语音触发"
+                    Util.sheduleVoiceTips "回潮", currentTobacco, "开始后", oldTargetValue, 0, False
+                End If
+                
+                If target.value <> "" Then
+                    Util.sheduleVoiceTips "回潮", currentTobacco, "开始后", target.value, 0
+                End If
             Else
                 Util.showMsg "日期并非今天, 回潮开始时间不会触发语音提醒"
             End If
         
         End If
         
-        If target.Column = endTimeColumn And Util.IsNum(target.value) Then
+        If target.Column = endTimeColumn And IsNumeric(target.value) Then
             '结束时间列触发批结束语音提醒, 下一批开始前提醒语音
             
             '注意下一批次是空白的情况
@@ -58,10 +75,20 @@ Private Sub Worksheet_Change(ByVal target As Range)
             
             '行的日期为今天或者是空内容时才进行提醒
             If dateOfSelectedRow = Date Then
-                '批结束提醒
-                Util.sheduleVoiceTips "回潮", currentTobacco, "结束后", target.value, 0
-                '下一批开始前提醒
-                Util.sheduleVoiceTips "回潮", nextTobacco, "开始前", target.value, 0
+                If oldTargetValue <> "" Then
+                    '取消用上一次时间锚定的批结束提醒
+                    Util.showMsg "取消以" & Format(oldTargetValue, "hh:mm") & "为锚定的语音触发"
+                    Util.sheduleVoiceTips "回潮", currentTobacco, "结束后", oldTargetValue, 0, False
+                    '取消用上一次时间锚定的下一批开始前提醒
+                    Util.sheduleVoiceTips "回潮", nextTobacco, "开始前", oldTargetValue, 0, False
+                End If
+                
+                If target.value <> "" Then
+                    '批结束提醒
+                    Util.sheduleVoiceTips "回潮", currentTobacco, "结束后", target.value, 0
+                    '下一批开始前提醒
+                    Util.sheduleVoiceTips "回潮", nextTobacco, "开始前", target.value, 0
+                End If
             Else
                  Util.showMsg "日期并非今天, 回潮结束时间不会触发语音提醒"
             End If
@@ -74,41 +101,6 @@ Public Sub checkBeforeWork()
 End Sub
 
 Public Sub guessFinishTime()
-'    Dim endTimeColumn, tobaccoNameColumn As Integer
-'    Dim tobaccoNameLastRow, endTimeLastRow As Integer
-'    Dim switchTime, tobaccoFinishTime As Integer
-'    Dim index As Integer
-'    Dim beginTime, endTime As Date
-'    Dim output, tobaccoName As String
-'
-'    'beginTimeColumn = Util.getColumnIndex("回潮段", "回潮秤开始时间")
-'    endTimeColumn = Util.getColumnIndex("回潮段", "结束时间")
-'    tobaccoNameColumn = Util.getColumnIndex("回潮段", "牌号")
-'    switchTime = Sheets("设定").Range("A:A").Find("回潮段转烟时间").Offset(0, 1).value
-'
-'    tobaccoNameLastRow = Cells(Rows.count, tobaccoNameColumn).End(xlUp).Row + 1
-'    endTimeLastRow = Cells(Rows.count, endTimeColumn).End(xlUp).Row + 1
-'
-'    If Cells(endTimeLastRow, endTimeColumn - 1).value = "" Then
-'        beginTime = DateAdd("n", switchTime, Cells(endTimeLastRow - 1, endTimeColumn).value)
-'    Else
-'        beginTime = Cells(endTimeLastRow, endTimeColumn - 1).value
-'    End If
-'
-'
-'    For index = endTimeLastRow To tobaccoNameLastRow - 1
-'        tobaccoName = Cells(index, tobaccoNameColumn).value
-'        tobaccoFinishTime = Util.getParam(tobaccoName, "回潮段生产时长")
-'
-'        endTime = DateAdd("n", tobaccoFinishTime, beginTime)
-'
-'        output = output + tobaccoName + " : " + Format(beginTime, "hh:mm") + " - " + Format(endTime, "hh:mm") + vbCrLf
-'
-'
-'        beginTime = DateAdd("n", switchTime, endTime)
-'    Next
-'
-'    MsgBox output
     Dim output As String
     
     output = Util.guessFinishTime("回潮段")

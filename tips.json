@@ -29,6 +29,18 @@
 				"content" : "六四回潮记得填写开始时间"
 			},
 			{
+				"sOffsetTime" : 20,
+				"deadLineOffset": 30,
+				"filter": ["双喜（莲香）", "双喜（经典）", "双喜", "双喜（01）", "双喜（国际）", "椰树（软）"],
+				"content" : "叶片风选风门开度48"
+			},
+			{
+				"sOffsetTime" : 20,
+				"deadLineOffset": 30,
+				"filter": ["经典HDT叶丝", "1906HDT叶丝", "01HDT叶丝"],
+				"content" : "叶片风选风门开度50"
+			},
+			{
 				"sOffsetTime" : 18,
 				"deadLineOffset": 30,
 				"content" : "六四除杂后暂存柜启动"
@@ -109,6 +121,11 @@
 				"sOffsetTime" : 3,
 				"deadLineOffset": 30,
 				"content" : "六四加料开始喷料，使用二二五镜头查看加料出口"
+			},
+			{
+				"sOffsetTime" : 1,
+				"deadLineOffset": 30,
+				"content" : "六四加料翻板门关闭"
 			}
 			
 		],
@@ -185,33 +202,33 @@
 				"content" : "六四烘丝记得填写开始时间"
 			},
 			{
-				"sOffsetTime" : 22,
+				"sOffsetTime" : 21,
 				"deadLineOffset": 30,
 				"content" : "六四烘丝上烟，填写开始时间"
 			},
 			{
-				"sOffsetTime" : 21,
+				"sOffsetTime" : 20,
 				"deadLineOffset": 30,
 				"content" : "六四检查进柜状态为待料，检查是否撞线"
 			},
 			{
-				"sOffsetTime" : 20,
+				"sOffsetTime" : 18,
 				"deadLineOffset": 30,
 				"content" : "六四烘丝水分仪通道号确认"
 			},
 			{
-				"sOffsetTime" : 6,
+				"sOffsetTime" : 5,
 				"deadLineOffset": 30,
-				"content" : "六四切丝转工单，检查贮叶柜出柜状态"
+				"content" : "六四切丝转工单，六四切丝转工单，检查贮叶柜出柜状态"
 			},
 			{
-				"sOffsetTime" : -8,
+				"sOffsetTime" : -6,
 				"deadLineOffset": 30,
 				"filter": ["双喜（莲香）"],
 				"content": "调低莲香出柜底带频率"
 			},
 			{
-				"sOffsetTime" : -8,
+				"sOffsetTime" : -6,
 				"deadLineOffset": 30,
 				"filter": ["双喜（莲香）", "双喜（经典1906）"],
 				"content" : "六四莲香, 经典1906储叶时间大于3小时"
@@ -275,10 +292,10 @@
 			{
 				"sOffsetTime" : 11,
 				"deadLineOffset": 30,
-				"content" : "六四提醒加香机开机, 查看加香电机频率"
+				"content" : "六四提醒加香机开机, 留意加香预填充状态"
 			},
 			{
-				"sOffsetTime" : 10,
+				"sOffsetTime" : 9,
 				"deadLineOffset": 30,
 				"content" : "烟到六四风选出口"
 			},
@@ -294,7 +311,7 @@
 				"content" : "六四查看烘丝出口水分，筒温"
 			},
 			{
-				"sOffsetTime" : 2,
+				"sOffsetTime" : 1,
 				"deadLineOffset": 30,
 				"content" : "六四烘丝出口振槽翻板门关闭"
 			},
@@ -305,6 +322,11 @@
 			}
 		],
 		"结束后": [
+			{
+				"sOffsetTime" : 26,
+				"deadLineOffset": 30,
+				"content" : "检查入柜情况"
+			},
 			{
 				"sOffsetTime" : 21,
 				"deadLineOffset": 30,
@@ -431,7 +453,7 @@
 		],
 		"外AB": [
 			{
-				"aOffsetTime" : 15,
+				"aOffsetTime" : 18,
 				"deadLineOffset": 30,
 				"content" : "六四烟到外运柜"
 			}

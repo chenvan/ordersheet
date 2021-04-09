@@ -78,6 +78,7 @@ Function IsNum(ByVal value As Variant) As Boolean
     IsNum = IsNumeric(value) And value <> ""
 End Function
 
+
 Sub clearContent()
     Dim answer As Integer
     Dim varResult As Variant
@@ -116,17 +117,21 @@ Sub clearContent()
     End If
 End Sub
 
-Sub speakLater(ByVal laterTime As Variant, ByVal content As String)
-    Application.OnTime laterTime, "'speakAsync """ & content & "'"
+Sub speakLater(ByVal laterTime As Variant, ByVal deadLineTime As Variant, ByVal content As String, ByVal sche As Boolean)
+    On Error Resume Next
+    '取消已经发生的 onTime 会引起错误
+    Application.OnTime EarliestTime:=laterTime, Procedure:="'speakAsync """ & content & "'", LatestTime:=deadLineTime, schedule:=sche
 End Sub
 
 Sub speakAsync(ByVal content As String)
     Application.Speech.speak content & "。" & content, True
 End Sub
 
-Sub showMsgLater(ByVal laterTime As Variant, ByVal content As String)
+Sub showMsgLater(ByVal laterTime As Variant, ByVal deadLineTime As Variant, ByVal content As String, ByVal sche As Boolean)
     'https://stackoverflow.com/questions/31439866/multiple-variable-arguments-to-application-ontime
-    Application.OnTime laterTime, "'showMsg """ & content & """,""" & laterTime & "'"
+    On Error Resume Next
+    '取消已经发生的 onTime 会引起错误
+    Application.OnTime EarliestTime:=laterTime, Procedure:="'showMsg """ & content & """,""" & laterTime & "'", LatestTime:=deadLineTime, schedule:=sche
 End Sub
 
 Sub showMsg(ByVal content As String, Optional ByVal laterTime As Variant = "")
@@ -138,7 +143,7 @@ Sub showMsg(ByVal content As String, Optional ByVal laterTime As Variant = "")
     Application.StatusBar = Format(laterTime, "hh:mm") & " " & content & "   " & Left(Application.StatusBar, 80)
 End Sub
 
-Sub sheduleVoiceTips(ByVal sheetName As String, ByVal tobaccoName As String, ByVal producePhase As String, ByVal baseTime As Variant, ByVal delay As Integer)
+Sub sheduleVoiceTips(ByVal sheetName As String, ByVal tobaccoName As String, ByVal producePhase As String, ByVal baseTime As Variant, ByVal delay As Integer, Optional ByVal sche As Boolean = True)
     
     Dim tipArray As Variant
     Dim tipSet As Scripting.Dictionary
@@ -171,14 +176,14 @@ Sub sheduleVoiceTips(ByVal sheetName As String, ByVal tobaccoName As String, ByV
         
         'Debug.Print realContent
         '装载语音
-        pushVoiceTip realContent, realOffsetTime + delay, baseTime, tipSet("deadLineOffset")
+        pushVoiceTip realContent, realOffsetTime + delay, baseTime, tipSet("deadLineOffset"), sche
        
 Continue:
     Next tipSet
     
 End Sub
 
-Sub sheduleVoiceTipsAboutStore(ByVal storePlace As String, ByVal tobaccoName As String, ByVal storeName As String, ByVal baseTime As Variant, ByVal delay As Integer)
+Sub sheduleVoiceTipsAboutStore(ByVal storePlace As String, ByVal tobaccoName As String, ByVal storeName As String, ByVal baseTime As Variant, ByVal delay As Integer, Optional ByVal sche As Boolean = True)
     Dim tipArray As Variant
     Dim tipSet As Scripting.Dictionary
     Dim realOffsetTime As Variant
@@ -229,44 +234,41 @@ Sub sheduleVoiceTipsAboutStore(ByVal storePlace As String, ByVal tobaccoName As 
             realOffsetTime = tipSet("sOffsetTime")
         End If
         
-        pushVoiceTip tipSet("content"), realOffsetTime + delay, baseTime, tipSet("deadLineOffset")
+        pushVoiceTip tipSet("content"), realOffsetTime + delay, baseTime, tipSet("deadLineOffset"), sche
     
     Next tipSet
 End Sub
 
-Sub pushVoiceTip(ByVal content As String, ByVal tsOffset, ByVal baseTime As Variant, ByVal deadLineOffset As Integer)
+Sub pushVoiceTip(ByVal content As String, ByVal tsOffset, ByVal baseTime As Variant, ByVal deadLineOffset As Integer, ByVal sche As Boolean)
 
     Dim triggerTime As Variant
     Dim deadLineTime As Variant
     
     triggerTime = baseTime + TimeSerial(0, tsOffset, 2)
     deadLineTime = triggerTime + TimeSerial(0, deadLineOffset, 0)
-
-    If triggerTime < Now And Now < deadLineTime Then
-        speakLater Now, content
-        showMsgLater Now, content
-    ElseIf Now <= triggerTime Then
-        speakLater triggerTime, content
-        showMsgLater triggerTime, content
-    Else
-        showMsg "超时,不进行提醒: $" & content
+    
+    '当 trigger 时间没到：那么无论是转载语音还是卸载语音，都正常执行
+    '当 trigger 时间已到，但 deadLine 时间没过：装载语音正常执行，卸载语音则忽略
+    '当 deadLine 时间已过：如果是装载语音，提醒超时，如果是卸载语音则忽略
+'    Debug.Print content
+'    Debug.Print Now
+'    Debug.Print triggerTime
+'    Debug.Print deadLineTime
+    
+    If triggerTime >= Now Then
+'        Debug.Print "1"
+        speakLater triggerTime, deadLineTime, content, sche
+        showMsgLater triggerTime, deadLineTime, content, sche
+    ElseIf Now > triggerTime And Now <= deadLineTime And sche Then
+'        Debug.Print "2"
+        speakLater triggerTime, deadLineTime, content, sche
+        showMsgLater triggerTime, deadLineTime, content, sche
+    ElseIf Now > deadLineTime And sche Then
+'        Debug.Print "3"
+        showMsg "超时,不进行提醒: " & content
     End If
+    
 End Sub
-
-'Sub runFirstBatchTip(ByVal sheetname As String)
-'    '需要修改逻辑
-'    Dim found As Range
-'    Dim firstTobaccoName As String
-'    'find today's first row
-'    Set found = Sheets(sheetname + "段").Range("A:A").Find(Date)
-'
-'    If found Is Nothing Then
-'        Util.showMsg "没有找到今天的日期"
-'    Else
-'        firstTobaccoName = found.Offset(0, 2).value
-'        sheduleVoiceTips sheetname, firstTobaccoName, "第一批", Now, 0
-'    End If
-'End Sub
 
 Sub checkBeforeWork(ByVal sheetName As String)
     Dim found As Range
@@ -379,11 +381,11 @@ Function getAddEssenceSweepDelay(ByVal tobaccoName As String, ByVal dateColIndex
     Dim count, delay, serialNum As Integer
 
     count = countSequentialTobaccoNum(tobaccoName, "切烘加香段", dateColIndex, tobaccoColIndex, lastRowIndex)
-    delay = 8
+    delay = 4
     
-    If count Mod 3 = 0 Then
+    If count Mod 4 = 0 Then
         '三批同牌号清洗一次
-        delay = 8
+        delay = 7
     ElseIf count > 0 Then
         serialNum = Sheets("切烘加香段").Cells(lastRowIndex, serialNumColIndex).value
         '第4批和第8批加香机需要清扫, 延时4分钟上烟

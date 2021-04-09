@@ -3,7 +3,7 @@ Option Explicit
 Private Sub Worksheet_Change(ByVal target As Range)
     Dim timeFormatColumns As Variant
     Dim beginTimeColumn, endTimeColumn As Integer
-    
+
     beginTimeColumn = Util.getColumnIndex("切烘加香段", "开始时间")
     endTimeColumn = Util.getColumnIndex("切烘加香段", "结束时间")
     
@@ -14,6 +14,7 @@ Private Sub Worksheet_Change(ByVal target As Range)
         Dim currentTobacco, nextTobacco As String
         Dim dateOfSelectedRow As Variant
         Dim dateColIndex, tobaccoColIndex, storeNameColIndex, serialNumColIndex As Integer
+        Dim oldTargetValue As Variant
         
         dateColIndex = Util.getColumnIndex("切烘加香段", "日期")
         tobaccoColIndex = Util.getColumnIndex("切烘加香段", "牌号")
@@ -22,20 +23,29 @@ Private Sub Worksheet_Change(ByVal target As Range)
         
         dateOfSelectedRow = target.Offset(0, dateColIndex - target.Column).value
         
-        If Util.IsInArray(target.Column, timeFormatColumns) And Util.IsNum(target.value) Then
+        'IsNumeric function will let empty string be true
+        If Util.IsInArray(target.Column, timeFormatColumns) And IsNumeric(target.value) Then
             'inputTime's column is time format, which is a double type
             'we input an int, but it will change to double type
             
             If Util.IsIntType(target.value) Then
                 Application.EnableEvents = False
-                target.value = Util.ParseInputTime(target.value, dateOfSelectedRow)
+                
+                Application.Undo
+                oldTargetValue = target.value
+                Application.Undo
+                
+                If target.value <> "" Then
+                    target.value = Util.ParseInputTime(target.value, dateOfSelectedRow)
+                End If
+                
                 Application.EnableEvents = True
             End If
             
         End If
         
-        
-        If target.Column = beginTimeColumn And Util.IsNum(target.value) Then
+        'IsNumeric function will let empty string be true
+        If target.Column = beginTimeColumn And IsNumeric(target.value) Then
             '开始时间列触发批开始语音提醒
             Dim storeName As String
             
@@ -46,21 +56,31 @@ Private Sub Worksheet_Change(ByVal target As Range)
             'Debug.Print (currentTobacco)
             'Debug.Print dateOfSelectedRow
             
-            '行的日期为今天或者是空内容时才进行提醒
+            '行的日期为今天时才进行提醒
             If dateOfSelectedRow = Date Then
                 If storeName = "" Then
                     Util.speakAsync "补全入柜信息, 并重新填写烘丝开始时间"
                     Exit Sub
                 End If
-                Util.sheduleVoiceTips "切烘加香", currentTobacco, "开始后", target.value, 0
-                Util.sheduleVoiceTipsAboutStore "贮丝柜", currentTobacco, storeName, target.value, 0
+                
+                If oldTargetValue <> "" Then
+                    Util.showMsg "取消以" & Format(oldTargetValue, "hh:mm") & "为锚定的语音触发"
+                    Util.sheduleVoiceTips "切烘加香", currentTobacco, "开始后", oldTargetValue, 0, False
+                    Util.sheduleVoiceTipsAboutStore "贮丝柜", currentTobacco, storeName, oldTargetValue, 0, False
+                End If
+                
+                If target.value <> "" Then
+                    Util.sheduleVoiceTips "切烘加香", currentTobacco, "开始后", target.value, 0
+                    Util.sheduleVoiceTipsAboutStore "贮丝柜", currentTobacco, storeName, target.value, 0
+                End If
             Else
                 Util.showMsg "日期并非今天, 烘丝开始时间不会触发语音提醒"
             End If
             
         End If
         
-        If target.Column = endTimeColumn And Util.IsNum(target.value) Then
+        'IsNumeric function will let empty string be true
+        If target.Column = endTimeColumn And IsNumeric(target.value) Then
            
             '结束时间
  
@@ -83,10 +103,20 @@ Private Sub Worksheet_Change(ByVal target As Range)
                 
                 addEssenceSweepDelay = Util.getAddEssenceSweepDelay(nextTobacco, dateColIndex, tobaccoColIndex, serialNumColIndex, target.Row)
                 
-                '批结束提醒
-                Util.sheduleVoiceTips "切烘加香", currentTobacco, "结束后", target.value, 0
-                '下一批开始前提醒
-                Util.sheduleVoiceTips "切烘加香", nextTobacco, "开始前", target.value, addEssenceSweepDelay
+                If oldTargetValue <> "" Then
+                    Util.showMsg "取消以" & Format(oldTargetValue, "hh:mm") & "为锚定的语音触发"
+                    '取消批结束提醒
+                    Util.sheduleVoiceTips "切烘加香", currentTobacco, "结束后", oldTargetValue, 0, False
+                    '取消下一批开始前提醒
+                    Util.sheduleVoiceTips "切烘加香", nextTobacco, "开始前", oldTargetValue, addEssenceSweepDelay, False
+                End If
+                
+                If target.value <> "" Then
+                    '批结束提醒
+                    Util.sheduleVoiceTips "切烘加香", currentTobacco, "结束后", target.value, 0
+                    '下一批开始前提醒
+                    Util.sheduleVoiceTips "切烘加香", nextTobacco, "开始前", target.value, addEssenceSweepDelay
+                End If
             Else
                 Util.showMsg "日期并非今天, 烘丝结束时间不会触发语音提醒"
             End If
