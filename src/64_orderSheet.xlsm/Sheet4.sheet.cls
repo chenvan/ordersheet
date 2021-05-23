@@ -11,17 +11,10 @@ Private Sub Worksheet_Change(ByVal target As Range)
     
     If Not IsArray(target.value) Then
     
-        Dim currentTobacco, nextTobacco As String
         Dim dateOfSelectedRow As Variant
-        Dim dateColIndex, tobaccoColIndex, storeNameColIndex, serialNumColIndex As Integer
         Dim oldTargetValue As Variant
         
-        dateColIndex = Util.getColumnIndex("切烘加香段", "日期")
-        tobaccoColIndex = Util.getColumnIndex("切烘加香段", "牌号")
-        storeNameColIndex = Util.getColumnIndex("切烘加香段", "入柜")
-        serialNumColIndex = Util.getColumnIndex("切烘加香段", "序号")
-        
-        dateOfSelectedRow = target.Offset(0, dateColIndex - target.Column).value
+        dateOfSelectedRow = Util.getValue("切烘加香段", "日期", target.Row)
         
         'IsNumeric function will let empty string be true
         If Util.IsInArray(target.Column, timeFormatColumns) And IsNumeric(target.value) Then
@@ -46,33 +39,10 @@ Private Sub Worksheet_Change(ByVal target As Range)
         
         'IsNumeric function will let empty string be true
         If target.Column = beginTimeColumn And IsNumeric(target.value) Then
-            '开始时间列触发批开始语音提醒
-            Dim storeName As String
-            
-            currentTobacco = target.Offset(0, tobaccoColIndex - target.Column).value
-            storeName = target.Offset(0, storeNameColIndex - target.Column).value
-            
-            
-            'Debug.Print (currentTobacco)
-            'Debug.Print dateOfSelectedRow
             
             '行的日期为今天时才进行提醒
             If dateOfSelectedRow = Date Then
-                If storeName = "" Then
-                    Util.speakAsync "补全入柜信息, 并重新填写烘丝开始时间"
-                    Exit Sub
-                End If
-                
-                If oldTargetValue <> "" Then
-                    Util.showMsg "取消以" & Format(oldTargetValue, "hh:mm") & "为锚定的语音触发"
-                    Util.sheduleVoiceTips "切烘加香", currentTobacco, "开始后", oldTargetValue, 0, False
-                    Util.sheduleVoiceTipsAboutStore "贮丝柜", currentTobacco, storeName, oldTargetValue, 0, False
-                End If
-                
-                If target.value <> "" Then
-                    Util.sheduleVoiceTips "切烘加香", currentTobacco, "开始后", target.value, 0
-                    Util.sheduleVoiceTipsAboutStore "贮丝柜", currentTobacco, storeName, target.value, 0
-                End If
+                Util.triggerBeginTimeVoiceTips "切烘加香段", oldTargetValue, target
             Else
                 Util.showMsg "日期并非今天, 烘丝开始时间不会触发语音提醒"
             End If
@@ -83,40 +53,10 @@ Private Sub Worksheet_Change(ByVal target As Range)
         If target.Column = endTimeColumn And IsNumeric(target.value) Then
            
             '结束时间
- 
-            currentTobacco = target.Offset(0, tobaccoColIndex - target.Column).value
-            nextTobacco = target.Offset(1, tobaccoColIndex - target.Column).value
-            
-            If nextTobacco = "" Then
-                '提醒写下一批次的烟牌,并重新填写这一批次的结束时间
-                'Debug.Print "空白牌号"
-                Util.speakAsync "请填下一批的牌号, 并重新填写这批烘丝结束时间"
-                Exit Sub
-            End If
-            
-            'dateOfSelectedRow = target.Offset(0, dateColIndex - target.Column).value
             
             '行的日期为今天才进行提醒
             If dateOfSelectedRow = Date Then
-                
-                Dim addEssenceSweepDelay As Integer
-                
-                addEssenceSweepDelay = Util.getAddEssenceSweepDelay(nextTobacco, dateColIndex, tobaccoColIndex, serialNumColIndex, target.Row)
-                
-                If oldTargetValue <> "" Then
-                    Util.showMsg "取消以" & Format(oldTargetValue, "hh:mm") & "为锚定的语音触发"
-                    '取消批结束提醒
-                    Util.sheduleVoiceTips "切烘加香", currentTobacco, "结束后", oldTargetValue, 0, False
-                    '取消下一批开始前提醒
-                    Util.sheduleVoiceTips "切烘加香", nextTobacco, "开始前", oldTargetValue, addEssenceSweepDelay, False
-                End If
-                
-                If target.value <> "" Then
-                    '批结束提醒
-                    Util.sheduleVoiceTips "切烘加香", currentTobacco, "结束后", target.value, 0
-                    '下一批开始前提醒
-                    Util.sheduleVoiceTips "切烘加香", nextTobacco, "开始前", target.value, addEssenceSweepDelay
-                End If
+                Util.triggerEndTimeVoiceTips "切烘加香段", oldTargetValue, target
             Else
                 Util.showMsg "日期并非今天, 烘丝结束时间不会触发语音提醒"
             End If
@@ -192,11 +132,19 @@ Public Sub calcuSettingTemp(Optional ByVal ck1Src As String = "setting")
     dryWeight = vol * (1 - inputWaterContent * 0.01)
     inputWeight = dryWeight / (1 - (inputWaterContent + sxWaterAdd) * 0.01)
     outputWeight = dryWeight / (1 - outputWaterContent * 0.01)
-    realWaterRemove = inputWeight - outputWeight
+    realWaterRemove = Round(inputWeight - outputWeight)
     
     settingTemp = (stdWaterRemove - realWaterRemove) * ck1 + realTemp
     
-    MsgBox "设定温度: " & Format(settingTemp, "000.0"), , tobaccoName
+    MsgBox "烘丝秤流量: " & vol & vbCrLf _
+            & "SX水分增加: " & sxWaterAdd & vbCrLf _
+            & "ck1: " & Format(ck1, "0.000") & vbCrLf & vbCrLf _
+            & "使用标准除水量计算温度: " & vbCrLf _
+            & "标准除水量: " & stdWaterRemove & vbCrLf _
+            & "设定温度: " & Format(settingTemp, "000.0") & vbCrLf & vbCrLf _
+            & "修改实际除水量为标准除水量: " & vbCrLf _
+            & "标准除水量: " & realWaterRemove & vbCrLf _
+            & "设定温度: " & Format(realTemp, "000.0"), , tobaccoName
 End Sub
 
 

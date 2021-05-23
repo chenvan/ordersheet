@@ -143,7 +143,7 @@ Sub showMsg(ByVal content As String, Optional ByVal laterTime As Variant = "")
     Application.StatusBar = Format(laterTime, "hh:mm") & " " & content & "   " & Left(Application.StatusBar, 80)
 End Sub
 
-Sub sheduleVoiceTips(ByVal sheetName As String, ByVal tobaccoName As String, ByVal producePhase As String, ByVal baseTime As Variant, ByVal delay As Integer, Optional ByVal sche As Boolean = True)
+Sub sheduleVoiceTips(ByVal sheetname As String, ByVal tobaccoName As String, ByVal producePhase As String, ByVal baseTime As Variant, ByVal delay As Integer, ByVal mode As String, Optional ByVal sche As Boolean = True)
     
     Dim tipArray As Variant
     Dim tipSet As Scripting.Dictionary
@@ -151,7 +151,7 @@ Sub sheduleVoiceTips(ByVal sheetName As String, ByVal tobaccoName As String, ByV
     Dim realOffsetTime As Variant
     
     '通过sheetName, producePhase加载所需的语音列表
-    Set tipArray = loadTips(sheetName, producePhase)
+    Set tipArray = loadTips(sheetname, producePhase)
     '遍历列表, 检查是否需要改变时间
     
     For Each tipSet In tipArray
@@ -159,6 +159,12 @@ Sub sheduleVoiceTips(ByVal sheetName As String, ByVal tobaccoName As String, ByV
         If tipSet.Exists("filter") Then
             If Not IsInCollection(tobaccoName, tipSet("filter")) Then GoTo Continue
         End If
+        
+        '检查语音提示是否有入柜方式的要求
+        If tipSet.Exists("mode") Then
+            If mode <> tipSet("mode") Then GoTo Continue
+        End If
+        
         
         '检查内容是否需要重置
         If tipSet.Exists("redirectList") Then
@@ -189,24 +195,34 @@ Sub sheduleVoiceTipsAboutStore(ByVal storePlace As String, ByVal tobaccoName As 
     Dim realOffsetTime As Variant
     Dim realStore As String
     
-    If storePlace = "贮叶柜" Then
-        '加载加料入柜tips
-        Dim storesInFeedLiquid As Variant
-    
-        storesInFeedLiquid = Array("1", "2", "3", "4", "5", "6")
+    If storePlace = "暂贮柜" Then
+        Dim addWaterStores As Variant
+        
+        addWaterStores = Array("1", "2", "3", "4")
         realStore = "HDT"
         
-        If IsInArray(storeName, storesInFeedLiquid) Then
+        If IsInArray(storeName, addWaterStores) Then
+            realStore = "叶柜"
+        End If
+        
+    ElseIf storePlace = "贮叶柜" Then
+        '加载加料入柜tips
+        Dim feedLiquidStores As Variant
+    
+        feedLiquidStores = Array("1", "2", "3", "4", "5", "6")
+        realStore = "HDT"
+        
+        If IsInArray(storeName, feedLiquidStores) Then
             realStore = "叶柜"
         End If
         
     Else
         '加载切烘入柜tips
-        Dim storesInAddEssence As Variant
+        Dim addEssenceStores As Variant
         Dim storeIndex As Integer
         
-        storesInAddEssence = Array("南A", "南B", "南C", "南D", "南E", "南F", "南G", "南H", "南J", "南K", "南L", "南M", "南N", "南P", "南Q", "南R", "南S", "南T", "木A", "木B", "木C", "北A", "北B", "北C", "北D", "北E", "北F", "北G", "北H", "外A", "外B")
-        storeIndex = Application.Match(storeName, storesInAddEssence, False)
+        addEssenceStores = Array("南A", "南B", "南C", "南D", "南E", "南F", "南G", "南H", "南J", "南K", "南L", "南M", "南N", "南P", "南Q", "南R", "南S", "南T", "木A", "木B", "木C", "北A", "北B", "北C", "北D", "北E", "北F", "北G", "北H", "外A", "外B")
+        storeIndex = Application.Match(storeName, addEssenceStores, False)
         
         realStore = "南AF"
         
@@ -270,18 +286,28 @@ Sub pushVoiceTip(ByVal content As String, ByVal tsOffset, ByVal baseTime As Vari
     
 End Sub
 
-Sub checkBeforeWork(ByVal sheetName As String)
+Sub checkBeforeWork(ByVal sheetname As String)
     Dim found As Range
-    Dim firstTobaccoName As String
+    Dim firstTobaccoName, mode As String
+    Dim modeOffsetIndex As Integer
     'find today's first row
-    Set found = Sheets(sheetName + "段").Range("A:A").Find(Date)
+    Set found = Sheets(sheetname).Range("A:A").Find(Date)
 
     If found Is Nothing Then
         Util.showMsg "没有找到今天的日期"
     Else
         firstTobaccoName = found.Offset(0, 2).value
-        sheduleVoiceTips sheetName, "", "第一批", Now, 0
-        sheduleVoiceTips sheetName, firstTobaccoName, "开始前", Now, 0
+        
+        If sheetname = "回潮" Then
+           modeOffsetIndex = 5
+        Else
+           modeOffsetIndex = 6
+        End If
+        
+        mode = found.Offset(0, modeOffsetIndex).value
+        
+        sheduleVoiceTips sheetname, "", "第一批", Now, 0, mode
+        sheduleVoiceTips sheetname, firstTobaccoName, "开始前", Now, 0, mode
     End If
 End Sub
 
@@ -329,10 +355,20 @@ EH:
 End Function
 
 
-Function getColumnIndex(ByVal sheetName As String, ByVal targetCol As String) As Integer
+Function getColumnIndex(ByVal sheetname As String, ByVal targetCol As String) As Integer
 
-    getColumnIndex = Sheets(sheetName).Range("A2:AZ2").Find(targetCol, lookat:=xlWhole).Column
+    getColumnIndex = Sheets(sheetname).Range("A2:AZ2").Find(targetCol, lookat:=xlWhole).Column
 
+End Function
+
+
+Function getValue(ByVal sheetname As String, ByVal columnName As String, ByVal rowIndex As Integer) As Variant
+    '获取数值
+    Dim columnIndex As Integer
+    columnIndex = getColumnIndex(sheetname, columnName)
+    
+    getValue = Sheets(sheetname).Cells(rowIndex, columnIndex)
+    
 End Function
 
 Function genNewContent(ByVal tobaccoName As String, ByRef paramCollection As Variant) As String
@@ -357,37 +393,38 @@ Function adjustOffsetTime(ByVal tobaccoName As String, ByVal offsetTime As Integ
     adjustOffsetTime = offsetTime + (9.375 - 0.0015 * mainTobaccoVolume)
 End Function
 
-Function countSequentialTobaccoNum(ByVal tobaccoName As String, ByVal sheetName As String, ByVal dateColIndex As Integer, ByVal tobaccoColIndex As Integer, ByVal lastRowIndex As Integer) As Integer
+'Function countSequentialTobaccoNum(ByVal tobaccoName As String, ByVal sheetname As String, ByVal dateColIndex As Integer, ByVal tobaccoColIndex As Integer, ByVal lastRowIndex As Integer) As Integer
+Function countSequentialTobaccoNum(ByVal tobaccoName As String, ByVal sheetname As String, ByVal lastRowIndex As Integer) As Integer
     Dim prevTobaccoName As String
     Dim currentDate, prevDate As Variant
     Dim count As Integer
     
     count = 0
     
-    prevTobaccoName = Sheets(sheetName).Cells(lastRowIndex, tobaccoColIndex).value
-    prevDate = Sheets(sheetName).Cells(lastRowIndex, dateColIndex).value
-    currentDate = Sheets(sheetName).Cells(lastRowIndex + 1, dateColIndex).value
+    prevTobaccoName = getValue(sheetname, "牌号", lastRowIndex)
+    prevDate = getValue(sheetname, "日期", lastRowIndex)
+    currentDate = getValue(sheetname, "日期", lastRowIndex + 1)
     
     While tobaccoName = prevTobaccoName And currentDate = prevDate
         count = count + 1
-        prevTobaccoName = Sheets(sheetName).Cells(lastRowIndex - count, tobaccoColIndex).value
-        prevDate = Sheets(sheetName).Cells(lastRowIndex - count, dateColIndex).value
+        prevTobaccoName = getValue(sheetname, "牌号", lastRowIndex - count)
+        prevDate = getValue(sheetname, "日期", lastRowIndex - count)
     Wend
     
     countSequentialTobaccoNum = count
 End Function
 
-Function getAddEssenceSweepDelay(ByVal tobaccoName As String, ByVal dateColIndex As Integer, ByVal tobaccoColIndex As Integer, ByVal serialNumColIndex As Integer, ByVal lastRowIndex As Integer) As Integer
+Function getAddEssenceSweepDelay(ByVal tobaccoName As String, ByVal lastRowIndex As Integer) As Integer
     Dim count, delay, serialNum As Integer
 
-    count = countSequentialTobaccoNum(tobaccoName, "切烘加香段", dateColIndex, tobaccoColIndex, lastRowIndex)
+    count = countSequentialTobaccoNum(tobaccoName, "切烘加香段", lastRowIndex)
     delay = 4
     
     If count Mod 4 = 0 Then
-        '三批同牌号清洗一次
+        '四批同牌号清洗一次
         delay = 7
     ElseIf count > 0 Then
-        serialNum = Sheets("切烘加香段").Cells(lastRowIndex, serialNumColIndex).value
+        serialNum = getValue("切烘加香段", "序号", lastRowIndex)
         '第4批和第8批加香机需要清扫, 延时4分钟上烟
         If serialNum = 4 Or serialNum = 8 Then
             delay = 4
@@ -400,10 +437,10 @@ Function getAddEssenceSweepDelay(ByVal tobaccoName As String, ByVal dateColIndex
     getAddEssenceSweepDelay = delay
 End Function
 
-Function getFeedLiquidSweepDelay(ByVal tobaccoName As String, ByVal dateColIndex As Integer, ByVal tobaccoColIndex As Integer, ByVal lastRowIndex As Integer) As Integer
+Function getFeedLiquidSweepDelay(ByVal tobaccoName As String, ByVal lastRowIndex As Integer) As Integer
     Dim count, delay As Integer
     
-    count = countSequentialTobaccoNum(tobaccoName, "加料段", dateColIndex, tobaccoColIndex, lastRowIndex)
+    count = countSequentialTobaccoNum(tobaccoName, "加料段", lastRowIndex)
     delay = 10
     
     If count Mod 4 = 0 Then
@@ -417,7 +454,7 @@ Function getFeedLiquidSweepDelay(ByVal tobaccoName As String, ByVal dateColIndex
     
 End Function
 
-Function guessFinishTime(sheetName As String) As String
+Function guessFinishTime(sheetname As String) As String
 
     Dim endTimeColIndex, tobaccoNameColIndex As Integer
     Dim tobaccoNameLastRow, endTimeLastRow As Integer
@@ -426,11 +463,10 @@ Function guessFinishTime(sheetName As String) As String
     Dim beginTime, endTime As Date
     Dim output, tobaccoName As String
 
-    endTimeColIndex = Util.getColumnIndex(sheetName, "结束时间")
-    '牌号的 colIndex 基本不会变, 都是第三列
-    tobaccoNameColIndex = 3
+    endTimeColIndex = Util.getColumnIndex(sheetname, "结束时间")
+    tobaccoNameColIndex = Util.getColumnIndex(sheetname, "牌号")
     output = ""
-    switchBaseTime = Sheets("设定").Range("A:A").Find(sheetName + "转烟时间").Offset(0, 1).value
+    switchBaseTime = Sheets("设定").Range("A:A").Find(sheetname + "转烟时间").Offset(0, 1).value
 
     tobaccoNameLastRow = Cells(Rows.count, tobaccoNameColIndex).End(xlUp).Row + 1
     endTimeLastRow = Cells(Rows.count, endTimeColIndex).End(xlUp).Row + 1
@@ -440,10 +476,10 @@ Function guessFinishTime(sheetName As String) As String
     If Cells(endTimeLastRow, endTimeColIndex - 1).value = "" Then
         'beginTime is empty
         switchAddTime = 0
-        If sheetName = "加料段" Then
-            switchAddTime = Util.getFeedLiquidSweepDelay(tobaccoName, 1, 3, endTimeLastRow - 1)
-        ElseIf sheetName = "切烘加香段" Then
-            switchAddTime = Util.getAddEssenceSweepDelay(tobaccoName, 1, 3, 2, endTimeLastRow - 1)
+        If sheetname = "加料段" Then
+            switchAddTime = Util.getFeedLiquidSweepDelay(tobaccoName, endTimeLastRow - 1)
+        ElseIf sheetname = "切烘加香段" Then
+            switchAddTime = Util.getAddEssenceSweepDelay(tobaccoName, endTimeLastRow - 1)
         End If
         beginTime = DateAdd("n", switchBaseTime + switchAddTime, Cells(endTimeLastRow - 1, endTimeColIndex).value)
     Else
@@ -453,7 +489,7 @@ Function guessFinishTime(sheetName As String) As String
 
     For index = endTimeLastRow To tobaccoNameLastRow - 1
 
-        tobaccoFinishTime = Util.getParam(tobaccoName, sheetName + "生产时长")
+        tobaccoFinishTime = Util.getParam(tobaccoName, sheetname + "生产时长")
 
         endTime = DateAdd("n", tobaccoFinishTime, beginTime)
 
@@ -463,10 +499,10 @@ Function guessFinishTime(sheetName As String) As String
 
         switchAddTime = 0
 
-        If sheetName = "加料段" Then
-            switchAddTime = Util.getFeedLiquidSweepDelay(tobaccoName, 1, 3, index)
-        ElseIf sheetName = "切烘加香段" Then
-            switchAddTime = Util.getAddEssenceSweepDelay(tobaccoName, 1, 3, 2, index)
+        If sheetname = "加料段" Then
+            switchAddTime = Util.getFeedLiquidSweepDelay(tobaccoName, index)
+        ElseIf sheetname = "切烘加香段" Then
+            switchAddTime = Util.getAddEssenceSweepDelay(tobaccoName, index)
         End If
 
         beginTime = DateAdd("n", switchBaseTime + switchAddTime, endTime)
@@ -478,6 +514,82 @@ Function guessFinishTime(sheetName As String) As String
     guessFinishTime = output
 
 End Function
+
+
+Sub triggerBeginTimeVoiceTips(ByVal sheetname As String, ByVal oldTargetValue As Variant, ByVal target As Variant)
+    Dim currentTobacco, mode, store, storeColumnName As String
+    
+    If sheetname = "回潮段" Then
+        storeColumnName = "暂贮柜"
+    ElseIf sheetname = "加料段" Then
+        storeColumnName = "贮叶柜"
+    Else
+        storeColumnName = "贮丝柜"
+    End If
+    
+    currentTobacco = getValue(sheetname, "牌号", target.Row)
+    mode = getValue(sheetname, "半柜", target.Row)
+    store = getValue(sheetname, storeColumnName, target.Row)
+    
+    If store = "" Then
+        speakAsync "补全" & storeColumnName & ", 并重新填写" & sheetname & "开始时间"
+        Exit Sub
+    End If
+    
+    If oldTargetValue <> "" Then
+        '取消用上一时间锚定的提醒
+        Util.showMsg "取消以" & Format(oldTargetValue, "hh:mm") & "为锚定的语音触发"
+        Util.sheduleVoiceTips sheetname, currentTobacco, "开始后", oldTargetValue, 0, mode, False
+        Util.sheduleVoiceTipsAboutStore storeColumnName, currentTobacco, store, oldTargetValue, 0, False
+    End If
+    
+    If target.value <> "" Then
+        Util.sheduleVoiceTips sheetname, currentTobacco, "开始后", target.value, 0, mode
+        Util.sheduleVoiceTipsAboutStore storeColumnName, currentTobacco, store, target.value, 0, mode
+    End If
+End Sub
+
+
+Sub triggerEndTimeVoiceTips(ByVal sheetname As String, ByVal oldTargetValue As Variant, ByVal target As Variant)
+    Dim currentTobacco, nextTobacco, mode, nextMode As String
+    Dim delay As Integer
+    
+    
+    currentTobacco = getValue(sheetname, "牌号", target.Row)
+    nextTobacco = getValue(sheetname, "牌号", target.Row + 1)
+    mode = getValue(sheetname, "半柜", target.Row)
+    nextMode = getValue(sheetname, "半柜", target.Row + 1)
+    
+    If nextTobacco = "" Then
+        '提醒写下一批次的烟牌,并重新填写这一批次的结束时间
+        'Debug.Print "空白牌号"
+        Util.speakAsync "填下一批牌号, 并重新填写" & sheetname & "结束时间"
+        Exit Sub
+    End If
+    
+    If sheetname = "回潮段" Then
+        delay = 0
+    ElseIf sheetname = "加料段" Then
+        delay = Util.getFeedLiquidSweepDelay(nextTobacco, target.Row)
+    Else
+        delay = Util.getAddEssenceSweepDelay(nextTobacco, target.Row)
+    End If
+    
+    If oldTargetValue <> "" Then
+        Util.showMsg "取消以" & Format(oldTargetValue, "hh:mm") & "为锚定的语音触发"
+        '取消批结束提醒
+        Util.sheduleVoiceTips sheetname, currentTobacco, "结束后", oldTargetValue, 0, mode, False
+        '取消下一批开始前提醒
+        Util.sheduleVoiceTips sheetname, nextTobacco, "开始前", oldTargetValue, delay, nextMode, False
+    End If
+    
+    If target.value <> "" Then
+        '批结束提醒
+        Util.sheduleVoiceTips sheetname, currentTobacco, "结束后", target.value, 0, mode
+        '下一批开始前提醒
+        Util.sheduleVoiceTips sheetname, nextTobacco, "开始前", target.value, delay, nextMode
+    End If
+End Sub
 
 
 
